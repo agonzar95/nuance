@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 2 - Core Services (in progress)
-- **Total Features:** 17 completed of 107 total
+- **Total Features:** 22 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `f38cbed` [PHASE-01] Foundation complete
+- **Last Commit:** `4fad8d7` [PHASE-02] Core Services - deployment configs and logging
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Configure deployment and establish all external service integrations.
 
-### Phase 2 Features (5/12 Complete)
+### Phase 2 Features (10/12 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -21,11 +21,11 @@
 | INF-005 | Environment Config | DONE | Easy | A |
 | INF-006 | Structured Logging | DONE | Easy | B |
 | INF-011 | CORS Configuration | DONE | Easy | B |
-| INT-001 | Supabase Client | TODO | Easy | C |
-| INT-002 | Claude API Client | TODO | Easy | C |
-| INT-003 | Deepgram Client | TODO | Easy | C |
-| INT-004 | Telegram API Client | TODO | Easy | C |
-| INT-005 | Resend Client | TODO | Easy | C |
+| INT-001 | Supabase Client | DONE | Easy | C |
+| INT-002 | Claude API Client | DONE | Easy | C |
+| INT-003 | Deepgram Client | DONE | Easy | C |
+| INT-004 | Telegram API Client | DONE | Easy | C |
+| INT-005 | Resend Client | DONE | Easy | C |
 | INT-006 | Voice Transcription | TODO | Medium | D |
 | INF-008 | Error Middleware | TODO | Easy | D |
 
@@ -33,7 +33,7 @@
 
 ## In Progress
 
-*Session ended - ready to continue with INT-001 through INT-005 (API clients).*
+*No features currently in progress. Ready to continue with INT-006 (Voice Transcription) and INF-008 (Error Middleware).*
 
 ---
 
@@ -158,7 +158,37 @@ All 12 features have no dependencies and can be built simultaneously:
 - ALLOWED_ORIGINS env var supports comma-separated list
 - Artifacts: Already in `backend/app/main.py`
 
+### INT-001: Supabase Client
+- Frontend: `@supabase/ssr` with `createBrowserClient` and `createServerClient`
+- Backend: `supabase-py` with service role key for admin operations
+- Includes Next.js middleware for session refresh
+- Artifacts: `frontend/src/lib/supabase/client.ts`, `server.ts`, `middleware.ts`, `frontend/src/middleware.ts`, `backend/app/clients/supabase.py`
+
+### INT-002: Claude API Client
+- Wrapper around Anthropic SDK with retry logic for rate limits
+- Methods: `chat()`, `chat_stream()`, `extract()` for structured output
+- Uses claude-sonnet-4-20250514 model
+- Artifacts: `backend/app/clients/claude.py`
+
+### INT-003: Deepgram Client
+- Wrapper around Deepgram SDK for Nova-2 model transcription
+- Async methods: `transcribe()` for bytes, `transcribe_url()` for URLs
+- Smart formatting and punctuation enabled
+- Artifacts: `backend/app/clients/deepgram.py`
+
+### INT-004: Telegram API Client
+- HTTP client using httpx for async operations
+- Methods: `send_message()`, `get_file()`, `set_webhook()`, `delete_webhook()`
+- Supports Markdown formatting in messages
+- Artifacts: `backend/app/clients/telegram.py`
+
+### INT-005: Resend Client
+- Wrapper around Resend SDK for transactional email
+- Includes template methods: `send_morning_summary()`, `send_eod_summary()`
+- Simple HTML-to-text fallback
+- Artifacts: `backend/app/clients/resend.py`
+
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Create API clients (INT-001 through INT-005), then INT-006 and INF-008*
+*Next session should: Create INT-006 (Voice Transcription service) and INF-008 (Error Middleware)*
