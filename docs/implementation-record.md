@@ -66,16 +66,21 @@
 
 ## In Progress
 
-**Phase 4 COMPLETE (16/16 features). Ready for Phase 5 - Notifications.**
+**Phase 5 IN PROGRESS (0/7 features). Started notification infrastructure.**
 
-Phase 5 features to implement:
-- NTF-001: Notification Preferences
-- NTF-002: Email Notifications
-- NTF-003: Telegram Bot
-- NTF-004: Notification Routing
-- NTF-005: Daily Digest
-- NTF-006: Nudge Engine
-- NTF-007: Streak Tracking
+Phase 5 features:
+- NTF-002: Email Client (Resend) - IN PROGRESS (base types created)
+- NTF-003: Telegram Bot Setup - TODO
+- NTF-004: Telegram Send - TODO
+- NTF-005: Telegram Receive - TODO
+- NTF-006: Telegram Commands - TODO
+- NTF-009: Channel Router - TODO
+- NTF-001: Gateway Abstraction - TODO
+
+**Partial work created:**
+- `backend/app/services/notifications/__init__.py` - package init
+- `backend/app/services/notifications/base.py` - base types (NotificationChannel, NotificationType, NotificationPayload, DeliveryResult, NotificationProvider)
+- `backend/app/services/notifications/providers/__init__.py` - providers init (imports need completion)
 
 ---
 
@@ -394,4 +399,4 @@ Phase 5 features to implement:
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Begin Phase 5 (Notifications) - Start with NTF-001 (Notification Preferences)*
+*Next session should: Continue Phase 5 - Complete NTF-002 (Email Provider), then NTF-003/NTF-004 (Telegram)*
