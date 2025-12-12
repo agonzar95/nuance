@@ -2,7 +2,7 @@
 
 ## Project Status
 - **Current Phase:** 4 - AI Layer (IN PROGRESS)
-- **Total Features:** 49 completed of 107 total
+- **Total Features:** 50 completed of 107 total
 - **Last Updated:** December 12, 2025
 - **Last Commit:** `424f7ea` [PHASE-04] Group C Extractors (12/16 features)
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
 
-### Phase 4 Features (14/16 Complete)
+### Phase 4 Features (15/16 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -30,7 +30,7 @@
 | AGT-013 | Intent Classifier | DONE | Easy | C |
 | AGT-011 | Extract: Confidence | DONE | Easy | D |
 | AGT-014 | Coaching Handler | DONE | Medium | D |
-| AGT-016 | Extraction Orchestrator | TODO | Medium | E |
+| AGT-016 | Extraction Orchestrator | DONE | Medium | E |
 | AGT-002 | Request Router | TODO | Medium | F |
 
 ### Phase 4 Validation Criteria
@@ -66,13 +66,10 @@
 
 ## In Progress
 
-**Completed Groups A+B+C+D features (14/16). Next: Group E and F.**
+**Completed Groups A+B+C+D+E features (15/16). Next: Group F to complete Phase 4.**
 
-Group E ready to implement:
-- AGT-016: Extraction Orchestrator (needs AGT-008 ✓, AGT-009 ✓, AGT-010 ✓, AGT-011 ✓)
-
-Then Group F:
-- AGT-002: Request Router (needs AGT-013 ✓, AGT-016, AGT-014 ✓)
+Group F ready to implement:
+- AGT-002: Request Router (needs AGT-013 ✓, AGT-016 ✓, AGT-014 ✓)
 
 ---
 
@@ -250,6 +247,13 @@ Then Group F:
 - Principles: validate feelings, normalize struggles, suggest tiny steps, no shame
 - Artifacts: `backend/app/services/coaching.py`
 
+### AGT-016: Extraction Orchestrator
+- `ExtractionOrchestrator` coordinates full extraction pipeline
+- Pipeline: extract actions → parallel (avoidance, complexity) → confidence
+- `EnrichedAction` model with all metadata (avoidance, complexity, confidence)
+- `OrchestrationResult` includes needs_validation flag for UI
+- Artifacts: `backend/app/services/extraction_orchestrator.py`
+
 ---
 
 ### SUB-001: Database Schema
@@ -374,4 +378,4 @@ Then Group F:
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Continue Phase 4 - Implement Group E (AGT-016), then Group F (AGT-002) to complete Phase 4*
+*Next session should: Complete Phase 4 - Implement AGT-002 (Request Router), then Phase 5 (Notifications)*
