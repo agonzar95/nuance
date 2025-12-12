@@ -1,71 +1,88 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 6 - Frontend Layer (COMPLETE)
-- **Total Features:** 68 completed of 107 total
+- **Current Phase:** 7 - Workflow Features (IN PROGRESS)
+- **Total Features:** 74 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** (pending)
+- **Last Commit:** `2f47cfc` [PHASE-06] COMPLETE - Frontend Layer
 
 ---
 
-## Current Phase: Phase 6 - Frontend Layer
+## Current Phase: Phase 7 - Workflow Features
 
-**Goal:** Build frontend infrastructure: API client, real-time handling, and PWA.
+**Goal:** Build the complete user workflows: Capture, Planning, Execution, Reflection.
 
-### Phase 6 Features (10/10 Complete)
+### Phase 7 Features (6/26 Complete)
 
-| ID | Feature | Status | Complexity | Parallel Group |
-|----|---------|--------|------------|----------------|
-| FE-001 | API Client | DONE | Easy | A |
-| FE-012 | PWA Manifest | DONE | Easy | A |
-| FE-015 | Navigation Component | DONE | Easy | A |
-| FE-002 | Optimistic Updates | DONE | Easy | B |
-| FE-003 | SSE Handler | DONE | Easy | B |
-| FE-004 | Real-time Handler | DONE | Easy | B |
-| FE-006 | Action Card Component | DONE | Easy | C |
-| FE-005 | Action List Component | DONE | Easy | D |
-| FE-013 | Service Worker | DONE | Easy | E |
-| FE-014 | Responsive Layout | DONE | Easy | F |
+#### Stage 1 - Foundation Components (6/6 Complete)
 
-### Phase 6 Validation Criteria
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| CAP-001 | Chat Message List | DONE | Easy | FE-003 |
+| PLN-001 | Inbox View | DONE | Easy | FE-006, FE-007, FE-010 |
+| PLN-002 | Today View | DONE | Easy | FE-010 |
+| REF-003 | Win Highlights | DONE | Easy | FE-007 |
+| REF-005 | Roll/Drop Controls | DONE | Easy | FE-007 |
+| REF-006 | Tomorrow Quick Capture | DONE | Easy | CAP-002 |
+
+#### Stage 2 - Execution Core (0/4 Pending)
+
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| EXE-002 | Focus Task Card | TODO | Easy | FE-007, EXE-003 |
+| EXE-001 | Focus Mode Container | TODO | Easy | EXE-002, EXE-004 |
+| EXE-005 | Breakdown Prompt | TODO | Easy | EXE-003 |
+| EXE-012 | Rest Screen | TODO | Easy | EXE-001 |
+
+#### Stage 3 - Capture Completions (0/5 Pending)
+
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| CAP-003 | Chat Voice Input | TODO | Medium | INT-003, INT-006 |
+| CAP-004 | Ghost Card | TODO | Easy | FE-006, AGT-016 |
+| CAP-005 | Confidence Validation | TODO | Easy | AGT-016, CAP-006 |
+| CAP-007 | Voice Error Handling | TODO | Easy | CAP-003 |
+| CAP-008 | Quick Capture Overlay | TODO | Easy | EXE-001 |
+
+#### Stage 4 - Planning Completions (0/5 Pending)
+
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| PLN-003 | Drag to Plan | TODO | Easy | PLN-001, PLN-002 |
+| PLN-004 | Reorder Tasks | TODO | Easy | PLN-002, FE-002 |
+| PLN-005 | Day Commit | TODO | Easy | PLN-002, EXE-001 |
+| PLN-007 | Add More Tasks | TODO | Easy | CAP-002, FE-005 |
+| PLN-008 | Remove from Today | TODO | Easy | PLN-002, FE-002 |
+
+#### Stage 5 - Execution Completions (0/6 Pending)
+
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| EXE-004 | Focus Timer | TODO | Easy | FE-008 |
+| EXE-006 | First Step Suggestions | TODO | Medium | AGT-012 |
+| EXE-009 | Coaching Overlay | TODO | Medium | AGT-014, CAP-001 |
+| EXE-008 | Stuck Options | TODO | Easy | EXE-005, EXE-009 |
+| EXE-007 | Stuck Button | TODO | Easy | EXE-008 |
+| EXE-010 | Complete Task Flow | TODO | Easy | EXE-011, EXE-012 |
+
+### Phase 7 Validation Criteria
 
 | Criterion | Test | Status |
 |-----------|------|--------|
-| API client works | Typed requests/responses | READY |
-| Optimistic updates | UI updates before server confirms | READY |
-| SSE handler | Streaming AI response displays | READY |
-| Real-time updates | Supabase changes reflected | READY |
-| Action card renders | All action properties displayed | READY |
-| Action list renders | Multiple cards with empty state | READY |
-| PWA installable | Manifest linked, icons configured | READY |
-| Service worker caches | Offline access works | READY |
-| Layout responsive | Mobile/tablet/desktop layouts | READY |
-| Navigation works | Routes change, active state shows | READY |
+| Chat displays | Messages render in scrollable list | READY |
+| Inbox shows actions | All inbox actions displayed | READY |
+| Today view works | Today's planned actions display | READY |
+| Win highlights | High-avoidance completions celebrated | READY |
+| Roll/drop works | Remaining tasks roll or drop | READY |
+| Tomorrow capture | Quick capture for tomorrow | READY |
 | TypeScript passes | `npm run typecheck` exits with 0 | PASS |
-
-### Phase Gate
-
-**Phase 6 is complete when:**
-- [x] API client successfully makes typed requests
-- [x] Optimistic updates work with rollback on failure
-- [x] SSE streaming displays in real-time
-- [x] Real-time subscriptions trigger UI updates
-- [x] All action components render correctly
-- [x] PWA manifest and icons configured
-- [x] Service worker handles offline scenarios
-- [x] Responsive layout adapts to all breakpoints
 
 ---
 
-## In Progress
+## Completed: Phase 6 - Frontend Layer
 
-**Phase 7 TODO (0/26 features). Workflow features: Capture, Planning, Execution, Reflection.**
-
-Phase 7 features (from 05_Implementation_Plan.md):
-- Capture: CAP-001, CAP-003, CAP-004, CAP-005, CAP-007, CAP-008
-- Planning: PLN-001, PLN-002, PLN-003, PLN-004, PLN-005, PLN-007, PLN-008
-- Execution: EXE-001, EXE-002, EXE-004, EXE-005, EXE-006, EXE-007, EXE-008, EXE-009, EXE-010, EXE-012
-- Reflection: REF-003, REF-005, REF-006
+**Goal:** Build frontend infrastructure: API client, real-time handling, and PWA.
+**Status:** COMPLETE
 
 ---
 
@@ -533,5 +550,60 @@ Phase 7 features (from 05_Implementation_Plan.md):
 
 ---
 
+## Phase 7 Implementation Notes
+
+### CAP-001: Chat Message List
+- `ChatMessageList` component with scrollable message history
+- `ChatBubble` subcomponent with role-based styling (user on right, AI on left)
+- Support for `streamingContent` prop for real-time AI responses
+- `TypingIndicator` component with animated dots
+- Auto-scroll to newest message via ref
+- Artifacts: `frontend/src/components/chat/ChatMessageList.tsx`
+
+### PLN-001: Inbox View
+- `InboxView` component displays AI-curated suggestions (max 12)
+- `InboxCard` subcomponent with selection checkbox and AI reasoning
+- `Suggestion` type includes action, reasoning, and priorityScore
+- Uses `ActionCardSkeleton` for loading state
+- Artifacts: `frontend/src/components/planning/InboxView.tsx`
+
+### PLN-002: Today View
+- `TodayView` component displays committed plan with date header
+- `TodayActionCard` subcomponent with drag handle and remove button
+- Shows total planned time, supports reordering
+- "Start Day" button triggers focus mode
+- Installed `date-fns` and `@hello-pangea/dnd` dependencies
+- Artifacts: `frontend/src/components/planning/TodayView.tsx`
+
+### REF-003: Win Highlights
+- `WinHighlights` component celebrates high-avoidance completions (weight >= 4)
+- Gradient background with decorative star
+- `WinCard` subcomponent with avoidance indicator
+- `filterHighAvoidanceWins` utility function
+- Artifacts: `frontend/src/components/reflection/WinHighlights.tsx`
+
+### REF-005: Roll/Drop Controls
+- `RemainingTaskCard` component with roll and drop buttons
+- Roll moves task to tomorrow, drop removes with confirmation
+- `DropConfirmDialog` inline confirmation overlay
+- `BatchRollDropControls` for handling all remaining tasks
+- Artifacts: `frontend/src/components/reflection/RemainingTaskCard.tsx`
+
+### REF-006: Tomorrow Quick Capture
+- `TomorrowQuickCapture` component for EOD quick thoughts
+- Simple text input with captured items list
+- Shows "Added for tomorrow" confirmation
+- "Finish" or "Skip for now" buttons
+- Keyboard support (Escape to skip)
+- Artifacts: `frontend/src/components/reflection/TomorrowQuickCapture.tsx`
+
+---
+
 *Last session ended: December 12, 2025*
-*Next session should: Start Phase 7 - Workflow features (Stage 1: CAP-001, PLN-001, PLN-002, REF-003, REF-005, REF-006)*
+*Next session should: Continue Phase 7 - Stage 2 Execution Core (EXE-002, EXE-004, EXE-005, EXE-001, EXE-012)*
+
+**Session Notes:**
+- Stage 1 complete (6/6 features): CAP-001, PLN-001, PLN-002, REF-003, REF-005, REF-006
+- Installed dependencies: `date-fns`, `@hello-pangea/dnd`
+- TypeScript passes
+- Ready to start EXE-002 (Focus Task Card) and EXE-004 (Focus Timer) in parallel
