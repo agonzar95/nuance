@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 4 - AI Layer (IN PROGRESS)
-- **Total Features:** 42 completed of 107 total
+- **Total Features:** 47 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `8bd9d00` [PHASE-03] Complete - Data Layer (11 features)
+- **Last Commit:** `9d484ed` [PHASE-04] AI Layer - Groups A+B (7/16 features)
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
 
-### Phase 4 Features (7/16 Complete)
+### Phase 4 Features (12/16 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -23,11 +23,11 @@
 | AGT-005 | Token Budgeting | DONE | Easy | B |
 | AGT-006 | SSE Streaming | DONE | Medium | B |
 | AGT-015 | Prompt Versioning | DONE | Easy | B |
-| AGT-008 | Extract: Actions | TODO | Medium | C |
-| AGT-009 | Extract: Avoidance Weight | TODO | Medium | C |
-| AGT-010 | Extract: Complexity | TODO | Easy | C |
-| AGT-012 | Extract: Breakdown | TODO | Medium | C |
-| AGT-013 | Intent Classifier | TODO | Easy | C |
+| AGT-008 | Extract: Actions | DONE | Medium | C |
+| AGT-009 | Extract: Avoidance Weight | DONE | Medium | C |
+| AGT-010 | Extract: Complexity | DONE | Easy | C |
+| AGT-012 | Extract: Breakdown | DONE | Medium | C |
+| AGT-013 | Intent Classifier | DONE | Easy | C |
 | AGT-011 | Extract: Confidence | TODO | Easy | D |
 | AGT-014 | Coaching Handler | TODO | Medium | D |
 | AGT-016 | Extraction Orchestrator | TODO | Medium | E |
@@ -41,10 +41,10 @@
 | Model abstraction works | Claude calls succeed via abstraction | READY |
 | Rate limiting enforces | Requests beyond limit rejected | READY |
 | SSE streams | Client receives streaming tokens | READY |
-| Action extraction works | Text → structured actions | TODO |
-| Avoidance detection works | High-avoidance tasks flagged | TODO |
-| Breakdown works | Complex task → subtasks | TODO |
-| Intent classification works | Message → intent label | TODO |
+| Action extraction works | Text → structured actions | READY |
+| Avoidance detection works | High-avoidance tasks flagged | READY |
+| Breakdown works | Complex task → subtasks | READY |
+| Intent classification works | Message → intent label | READY |
 | Coaching responds | Multi-turn coaching dialogue works | TODO |
 | Router routes | Different intents hit correct handlers | TODO |
 | TypeScript passes | `tsc --noEmit` exits with 0 | PASS |
@@ -66,14 +66,17 @@
 
 ## In Progress
 
-**Completed Group A+B features (7/16). Next: Group C extractors.**
+**Completed Groups A+B+C features (12/16). Next: Group D features.**
 
-Group C features ready to implement:
-- AGT-008: Extract Actions (needs AGT-007 ✓, AGT-015 ✓)
-- AGT-009: Extract Avoidance Weight (needs AGT-007 ✓, AGT-015 ✓)
-- AGT-010: Extract Complexity (needs AGT-007 ✓)
-- AGT-012: Extract Breakdown (needs AGT-007 ✓, AGT-015 ✓)
-- AGT-013: Intent Classifier (needs AGT-007 ✓)
+Group D features ready to implement:
+- AGT-011: Extract Confidence (needs AGT-008 ✓)
+- AGT-014: Coaching Handler (needs AGT-007 ✓, AGT-006 ✓)
+
+Then Group E:
+- AGT-016: Extraction Orchestrator (needs AGT-008 ✓, AGT-009 ✓, AGT-010 ✓, AGT-011)
+
+Finally Group F:
+- AGT-002: Request Router (needs AGT-013 ✓, AGT-016, AGT-014)
 
 ---
 
@@ -202,6 +205,41 @@ Group C features ready to implement:
 - Supports multiple versions per prompt for A/B testing
 - Artifacts: `backend/app/prompts/registry.py`, `backend/app/prompts/__init__.py`
 
+### AGT-008: Extract Actions
+- `ExtractionService` parses natural language into structured actions
+- `ExtractedAction` model with title, estimated_minutes, raw_segment
+- `ExtractionResult` includes actions list, confidence, and ambiguities
+- Uses AI provider `extract()` with versioned "extraction" prompt
+- Artifacts: `backend/app/services/extraction.py`
+
+### AGT-009: Extract Avoidance Weight
+- `AvoidanceService` detects emotional resistance in task descriptions
+- `AvoidanceAnalysis` model with weight (1-5), signals, reasoning
+- Scores based on dread words, anxiety markers, avoidance history
+- Supports batch processing via `detect_batch()`
+- Artifacts: `backend/app/services/avoidance.py`
+
+### AGT-010: Extract Complexity
+- `ComplexityService` classifies tasks as atomic/composite/project
+- `ComplexityAnalysis` model with complexity enum, suggested_steps, needs_breakdown
+- Fast-path: tasks ≤20min classified as atomic without AI call
+- Uses existing `ActionComplexity` enum from database models
+- Artifacts: `backend/app/services/complexity.py`
+
+### AGT-012: Extract Breakdown
+- `BreakdownService` generates 3-5 micro-steps for complex tasks
+- `BreakdownStep` model with title, estimated_minutes (max 15), is_physical
+- Steps are physical, immediate, and tiny (2-10 min)
+- Focus on initiation - overcoming paralysis to start
+- Artifacts: `backend/app/services/breakdown.py`
+
+### AGT-013: Intent Classifier
+- `IntentClassifier` routes messages to capture/coaching/command
+- `Intent` enum with CAPTURE, COACHING, COMMAND values
+- Fast-path heuristics: command prefix (/), action verbs, coaching signals
+- Falls back to AI classification for ambiguous cases
+- Artifacts: `backend/app/services/intent.py`
+
 ---
 
 ### SUB-001: Database Schema
@@ -326,4 +364,4 @@ Group C features ready to implement:
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Continue Phase 4 - Implement Group C extractors (AGT-008, AGT-009, AGT-010, AGT-012, AGT-013)*
+*Next session should: Continue Phase 4 - Implement Group D (AGT-011, AGT-014), then Group E (AGT-016), then Group F (AGT-002)*

@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from deepgram import DeepgramClient, PrerecordedOptions
+from deepgram import DeepgramClient
 import structlog
 
 from app.config import settings
@@ -24,12 +24,13 @@ class DeepgramTranscriber:
             raise ValueError("Deepgram API key must be configured")
 
         self.client = DeepgramClient(self.api_key)
-        self.options = PrerecordedOptions(
-            model="nova-2",
-            smart_format=True,
-            punctuate=True,
-            language="en"
-        )
+        # Options for prerecorded transcription in SDK v5.x format
+        self.options: dict[str, Any] = {
+            "model": "nova-2",
+            "smart_format": True,
+            "punctuate": True,
+            "language": "en",
+        }
 
     async def transcribe(self, audio_bytes: bytes, mimetype: str = "audio/webm") -> str:
         """Transcribe audio bytes to text.
@@ -45,9 +46,10 @@ class DeepgramTranscriber:
             Exception: If transcription fails.
         """
         try:
+            # Deepgram SDK v5.x uses listen.rest.v("1").transcribe_file()
             response: Any = await self.client.listen.asyncrest.v("1").transcribe_file(
                 {"buffer": audio_bytes, "mimetype": mimetype},
-                self.options
+                self.options,
             )
 
             # Extract transcript from response
@@ -56,7 +58,7 @@ class DeepgramTranscriber:
             logger.info(
                 "Transcription complete",
                 length=len(transcript),
-                words=len(transcript.split())
+                words=len(transcript.split()),
             )
 
             return transcript
@@ -75,16 +77,17 @@ class DeepgramTranscriber:
             Transcribed text.
         """
         try:
+            # Deepgram SDK v5.x uses listen.rest.v("1").transcribe_url()
             response: Any = await self.client.listen.asyncrest.v("1").transcribe_url(
                 {"url": audio_url},
-                self.options
+                self.options,
             )
 
             transcript: str = response.results.channels[0].alternatives[0].transcript
 
             logger.info(
                 "URL transcription complete",
-                length=len(transcript)
+                length=len(transcript),
             )
 
             return transcript
