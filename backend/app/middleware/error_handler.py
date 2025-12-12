@@ -83,6 +83,26 @@ class ExternalServiceError(AppException):
     message = "External service unavailable"
 
 
+class RateLimitError(AppException):
+    """Rate limit exceeded."""
+    status_code = 429
+    error_code = "RATE_LIMIT_EXCEEDED"
+    message = "Rate limit exceeded"
+
+    def __init__(
+        self,
+        retry_after: int = 60,
+        limit_type: str = "minute",
+        message: str | None = None,
+    ):
+        self.retry_after = retry_after
+        self.limit_type = limit_type
+        super().__init__(
+            message=message or f"Rate limit exceeded ({limit_type})",
+            details={"retry_after": retry_after, "limit_type": limit_type},
+        )
+
+
 # ============================================================================
 # Exception Handlers
 # ============================================================================
@@ -157,6 +177,31 @@ async def pydantic_validation_handler(
     )
 
 
+async def rate_limit_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Handle rate limit exceeded errors with Retry-After header."""
+    request_id = get_request_id(request)
+
+    rate_exc = exc if isinstance(exc, RateLimitError) else RateLimitError()
+
+    logger.warning(
+        "Rate limit exceeded",
+        user_id=getattr(request.state, "user_id", None),
+        limit_type=rate_exc.limit_type,
+        retry_after=rate_exc.retry_after,
+    )
+
+    return JSONResponse(
+        status_code=429,
+        content=ErrorResponse(
+            error=rate_exc.error_code,
+            message=rate_exc.message,
+            request_id=request_id,
+            details=rate_exc.details,
+        ).model_dump(),
+        headers={"Retry-After": str(rate_exc.retry_after)},
+    )
+
+
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle all unhandled exceptions.
 
@@ -201,6 +246,7 @@ def setup_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AuthenticationError, app_exception_handler)
     app.add_exception_handler(AuthorizationError, app_exception_handler)
     app.add_exception_handler(ExternalServiceError, app_exception_handler)
+    app.add_exception_handler(RateLimitError, rate_limit_handler)
 
     # Pydantic validation errors
     app.add_exception_handler(PydanticValidationError, pydantic_validation_handler)

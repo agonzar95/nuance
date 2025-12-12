@@ -1,65 +1,86 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 3 - Data Layer (COMPLETE)
-- **Total Features:** 35 completed of 107 total
+- **Current Phase:** 4 - AI Layer (IN PROGRESS)
+- **Total Features:** 42 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `d13d735` [PHASE-03] Complete - Data Layer (11 features)
+- **Last Commit:** `8bd9d00` [PHASE-03] Complete - Data Layer (11 features)
 
 ---
 
-## Current Phase: Phase 3 - Data Layer
+## Current Phase: Phase 4 - AI Layer
 
-**Goal:** Establish database schema, authentication, and real-time subscriptions.
+**Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
 
-### Phase 3 Features (11/11 Complete)
+### Phase 4 Features (7/16 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
-| SUB-001 | Database Schema | DONE | Medium | A |
-| AGT-003 | Circuit Breakers | DONE | Easy | A |
-| SUB-002 | RLS Policies | DONE | Easy | B |
-| SUB-003 | Email/Password Auth | DONE | Easy | B |
-| SUB-013 | Real-time Subscriptions | DONE | Easy | B |
-| SUB-004 | Google OAuth | DONE | Easy | C |
-| SUB-005 | Profile Management | DONE | Easy | C |
-| SUB-006 | Session Handling | DONE | Easy | C |
-| SUB-007 | Notification Preferences | DONE | Easy | D |
-| SUB-008 | Timezone Handling | DONE | Easy | D |
-| SUB-009 | Job: State Transitions | DONE | Easy | E |
+| AGT-001 | Orchestrator Setup | DONE | Medium | A |
+| AGT-007 | Model Abstraction | DONE | Easy | A |
+| INF-007 | Intent Log Recording | DONE | Easy | A |
+| AGT-004 | Rate Limiting | DONE | Easy | B |
+| AGT-005 | Token Budgeting | DONE | Easy | B |
+| AGT-006 | SSE Streaming | DONE | Medium | B |
+| AGT-015 | Prompt Versioning | DONE | Easy | B |
+| AGT-008 | Extract: Actions | TODO | Medium | C |
+| AGT-009 | Extract: Avoidance Weight | TODO | Medium | C |
+| AGT-010 | Extract: Complexity | TODO | Easy | C |
+| AGT-012 | Extract: Breakdown | TODO | Medium | C |
+| AGT-013 | Intent Classifier | TODO | Easy | C |
+| AGT-011 | Extract: Confidence | TODO | Easy | D |
+| AGT-014 | Coaching Handler | TODO | Medium | D |
+| AGT-016 | Extraction Orchestrator | TODO | Medium | E |
+| AGT-002 | Request Router | TODO | Medium | F |
 
-### Phase 3 Validation Criteria
+### Phase 4 Validation Criteria
 
 | Criterion | Test | Status |
 |-----------|------|--------|
-| Schema applies | Supabase migrations run without error | READY |
-| RLS enforces | Unauthorized queries rejected | READY |
-| Email auth works | Register → Login → Session created | READY |
-| Google OAuth works | OAuth flow completes, session created | READY |
-| Profile CRUD works | Create, read, update profile succeeds | READY |
-| Session persists | Refresh token works across browser close | READY |
-| Prefs save | Notification preferences persist | READY |
-| Timezone works | User timezone stored and retrieved | READY |
-| Realtime connects | Subscription receives updates | READY |
+| Orchestrator runs | Request/response cycle works | READY |
+| Model abstraction works | Claude calls succeed via abstraction | READY |
+| Rate limiting enforces | Requests beyond limit rejected | READY |
+| SSE streams | Client receives streaming tokens | READY |
+| Action extraction works | Text → structured actions | TODO |
+| Avoidance detection works | High-avoidance tasks flagged | TODO |
+| Breakdown works | Complex task → subtasks | TODO |
+| Intent classification works | Message → intent label | TODO |
+| Coaching responds | Multi-turn coaching dialogue works | TODO |
+| Router routes | Different intents hit correct handlers | TODO |
 | TypeScript passes | `tsc --noEmit` exits with 0 | PASS |
 | Python types pass | `mypy` exits with 0 (excl. supabase lib) | PASS |
 
 ### Phase Gate
 
-**Phase 3 is complete when:**
-- [x] Database schema deployed to Supabase
-- [x] RLS policies block unauthorized access
-- [x] Email/password registration and login work
-- [x] Google OAuth flow completes successfully
-- [x] Profile CRUD operations work
-- [x] Real-time subscriptions receive updates
-- [x] All auth integration tests pass
+**Phase 4 is complete when:**
+- [x] Orchestrator handles request/response cycle
+- [x] SSE streaming delivers tokens to client
+- [ ] All 5 extractors produce valid outputs
+- [ ] Extraction orchestrator coordinates parallel extraction
+- [ ] Intent classifier routes to correct handler
+- [ ] Coaching handler maintains multi-turn state
+- [ ] Request router correctly dispatches all intent types
+- [ ] Integration tests pass for each extractor
 
 ---
 
 ## In Progress
 
-*Phase 3 complete. Ready to begin Phase 4 - AI Layer.*
+**Completed Group A+B features (7/16). Next: Group C extractors.**
+
+Group C features ready to implement:
+- AGT-008: Extract Actions (needs AGT-007 ✓, AGT-015 ✓)
+- AGT-009: Extract Avoidance Weight (needs AGT-007 ✓, AGT-015 ✓)
+- AGT-010: Extract Complexity (needs AGT-007 ✓)
+- AGT-012: Extract Breakdown (needs AGT-007 ✓, AGT-015 ✓)
+- AGT-013: Intent Classifier (needs AGT-007 ✓)
+
+---
+
+## Completed: Phase 3 - Data Layer
+
+**Goal:** Establish database schema, authentication, and real-time subscriptions.
+**Status:** COMPLETE
 
 ---
 
@@ -131,6 +152,57 @@
 ---
 
 ## Implementation Notes
+
+### AGT-001: Orchestrator Setup
+- Main AI router at `/api/ai` with authentication middleware
+- JWT validation via Supabase tokens in `backend/app/auth.py`
+- Endpoints: `/chat`, `/chat/stream`, `/extract`, `/status`
+- User dependency injection for all endpoints
+- Artifacts: `backend/app/auth.py`, `backend/app/routers/ai.py`
+
+### AGT-007: Model Abstraction
+- Abstract `AIProvider` interface in `backend/app/ai/base.py`
+- `ClaudeProvider` implementation with async support
+- Methods: `complete()`, `stream()`, `extract()`
+- Factory function `get_ai_provider()` for dependency injection
+- Artifacts: `backend/app/ai/base.py`, `backend/app/ai/claude.py`, `backend/app/ai/__init__.py`
+
+### INF-007: Intent Log Recording
+- SQL migration `003_intent_log.sql` for intent_log table
+- Service function `log_intent()` records all AI interactions
+- Captures: raw_input, intent, extraction_result, response, prompt_version, tokens
+- RLS enabled but no user-facing policies (admin analytics only)
+- Artifacts: `backend/supabase/migrations/003_intent_log.sql`, `backend/app/services/intent_logger.py`
+
+### AGT-004: Rate Limiting
+- In-memory rate limiter with per-minute (60) and per-day (500) limits
+- `RateLimiter` class in `backend/app/utils/rate_limiter.py`
+- Returns 429 with Retry-After header when exceeded
+- `RateLimitError` exception with custom handler
+- Artifacts: `backend/app/utils/rate_limiter.py`, updated `backend/app/middleware/error_handler.py`
+
+### AGT-005: Token Budgeting
+- `TokenBudgetService` for tracking daily token usage
+- Default 100K tokens/day limit with warning at 80%
+- Records usage to existing `token_usage` table
+- `BudgetStatus` dataclass with remaining/warning info
+- Artifacts: `backend/app/services/token_budget.py`
+
+### AGT-006: SSE Streaming
+- Added `sse-starlette` dependency for Server-Sent Events
+- `/api/ai/chat/stream` endpoint with EventSourceResponse
+- Event types: `message` (chunks), `done` (completion), `error`
+- Uses `AIProvider.stream()` for async iteration
+- Artifacts: Updated `backend/app/routers/ai.py`, `backend/requirements.txt`
+
+### AGT-015: Prompt Versioning
+- `PromptRegistry` for centralized prompt management
+- `PromptVersion` dataclass with name, version, content, metadata
+- Pre-loaded prompts: extraction, avoidance, complexity, breakdown, intent, coaching, confidence
+- Supports multiple versions per prompt for A/B testing
+- Artifacts: `backend/app/prompts/registry.py`, `backend/app/prompts/__init__.py`
+
+---
 
 ### SUB-001: Database Schema
 - Created `backend/supabase/migrations/001_initial_schema.sql`
@@ -254,4 +326,4 @@
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Begin Phase 4 - AI Layer (AGT-001 Orchestrator Setup, AGT-007 Model Abstraction, etc.)*
+*Next session should: Continue Phase 4 - Implement Group C extractors (AGT-008, AGT-009, AGT-010, AGT-012, AGT-013)*
