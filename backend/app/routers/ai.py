@@ -19,6 +19,12 @@ from app.auth import CurrentUser, User
 from app.clients.claude import ClaudeClient, get_claude_client
 from app.middleware.error_handler import RateLimitError
 from app.utils.rate_limiter import RateLimiter, RateLimitResult, get_rate_limiter
+from app.services.intent import Intent
+from app.services.intent_router import (
+    IntentRouter,
+    RouterResponse,
+    get_intent_router,
+)
 
 logger = structlog.get_logger()
 
@@ -62,6 +68,17 @@ class ExtractResponse(BaseModel):
     success: bool
     data: dict[str, Any] | None = None
     error: str | None = None
+
+
+class ProcessRequest(BaseModel):
+    """Request body for the main process endpoint."""
+
+    text: str = Field(..., min_length=1, description="User message text")
+    task_id: str | None = Field(None, description="Optional task context for coaching")
+    task_title: str | None = Field(None, description="Optional task title for context")
+    force_intent: Intent | None = Field(
+        None, description="Force a specific intent (skip classification)"
+    )
 
 
 # ============================================================================
@@ -266,3 +283,137 @@ async def status(
     }
 
 
+# ============================================================================
+# Intent-Based Process Endpoints (AGT-002)
+# ============================================================================
+
+
+@router.post("/process", response_model=RouterResponse)
+async def process(
+    request: ProcessRequest,
+    user: CurrentUser,
+    rate_limit: RateLimit,
+    intent_router: IntentRouter = Depends(get_intent_router),
+) -> RouterResponse:
+    """Process a message through the intent router.
+
+    This is the main entry point for user messages. It:
+    1. Classifies the intent (CAPTURE, COACHING, or COMMAND)
+    2. Routes to the appropriate handler
+    3. Returns a unified response
+
+    Intent Types:
+    - CAPTURE: Task capture and extraction (e.g., "Buy milk and call mom")
+    - COACHING: Emotional support (e.g., "I can't focus today")
+    - COMMAND: System commands (e.g., "/help")
+
+    You can force a specific intent using the force_intent field to skip
+    classification. This is useful for UI flows where the intent is known.
+    """
+    logger.info(
+        "Processing message",
+        user_id=user.id,
+        text_length=len(request.text),
+        force_intent=request.force_intent,
+    )
+
+    if request.force_intent:
+        # Skip classification, use forced intent
+        return await intent_router.route_with_intent(
+            text=request.text,
+            intent=request.force_intent,
+            user_id=user.id,
+            task_id=request.task_id,
+            task_title=request.task_title,
+        )
+
+    # Normal flow: classify and route
+    return await intent_router.route(
+        text=request.text,
+        user_id=user.id,
+        task_id=request.task_id,
+        task_title=request.task_title,
+    )
+
+
+@router.post("/process/stream")
+async def process_stream(
+    request: ProcessRequest,
+    user: CurrentUser,
+    rate_limit: RateLimit,
+    intent_router: IntentRouter = Depends(get_intent_router),
+) -> EventSourceResponse:
+    """Stream a response using Server-Sent Events.
+
+    Currently only supports COACHING intent for streaming responses.
+    Other intents return their results as a single 'result' event.
+
+    SSE Event Types:
+    - message: Text chunk from coaching (streaming)
+    - result: Full result JSON for non-streaming intents
+    - done: Stream complete
+    - error: An error occurred
+    """
+    logger.info(
+        "Processing streaming message",
+        user_id=user.id,
+        text_length=len(request.text),
+    )
+
+    async def event_generator() -> AsyncIterator[dict[str, str]]:
+        """Generate SSE events based on intent."""
+        try:
+            # Determine intent
+            if request.force_intent:
+                intent = request.force_intent
+            else:
+                intent_result = await intent_router.classifier.classify(request.text)
+                intent = intent_result.intent
+
+            # Streaming is only for coaching
+            if intent == Intent.COACHING:
+                # Stream coaching response
+                async for chunk in intent_router.stream_coaching(
+                    text=request.text,
+                    user_id=user.id,
+                    task_id=request.task_id,
+                    task_title=request.task_title,
+                ):
+                    yield {
+                        "event": "message",
+                        "data": json.dumps({"content": chunk}),
+                    }
+            else:
+                # Non-streaming: process and return result
+                if request.force_intent:
+                    result = await intent_router.route_with_intent(
+                        text=request.text,
+                        intent=intent,
+                        user_id=user.id,
+                        task_id=request.task_id,
+                        task_title=request.task_title,
+                    )
+                else:
+                    result = await intent_router.route(
+                        text=request.text,
+                        user_id=user.id,
+                        task_id=request.task_id,
+                        task_title=request.task_title,
+                    )
+
+                yield {
+                    "event": "result",
+                    "data": result.model_dump_json(),
+                }
+
+            # Signal completion
+            yield {"event": "done", "data": "{}"}
+
+        except Exception as e:
+            logger.error("Stream error", error=str(e), user_id=user.id)
+            yield {
+                "event": "error",
+                "data": json.dumps({"error": str(e)}),
+            }
+
+    return EventSourceResponse(event_generator())

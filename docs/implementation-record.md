@@ -1,10 +1,10 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 4 - AI Layer (IN PROGRESS)
-- **Total Features:** 50 completed of 107 total
+- **Current Phase:** 4 - AI Layer (COMPLETE)
+- **Total Features:** 51 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `424f7ea` [PHASE-04] Group C Extractors (12/16 features)
+- **Last Commit:** `df159e2` [PHASE-04] Group E - Extraction Orchestrator (15/16 features)
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
 
-### Phase 4 Features (15/16 Complete)
+### Phase 4 Features (16/16 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -31,7 +31,7 @@
 | AGT-011 | Extract: Confidence | DONE | Easy | D |
 | AGT-014 | Coaching Handler | DONE | Medium | D |
 | AGT-016 | Extraction Orchestrator | DONE | Medium | E |
-| AGT-002 | Request Router | TODO | Medium | F |
+| AGT-002 | Request Router | DONE | Medium | F |
 
 ### Phase 4 Validation Criteria
 
@@ -46,7 +46,7 @@
 | Breakdown works | Complex task → subtasks | READY |
 | Intent classification works | Message → intent label | READY |
 | Coaching responds | Multi-turn coaching dialogue works | READY |
-| Router routes | Different intents hit correct handlers | TODO |
+| Router routes | Different intents hit correct handlers | READY |
 | TypeScript passes | `tsc --noEmit` exits with 0 | PASS |
 | Python types pass | `mypy` exits with 0 (excl. supabase lib) | PASS |
 
@@ -55,21 +55,27 @@
 **Phase 4 is complete when:**
 - [x] Orchestrator handles request/response cycle
 - [x] SSE streaming delivers tokens to client
-- [ ] All 5 extractors produce valid outputs
-- [ ] Extraction orchestrator coordinates parallel extraction
-- [ ] Intent classifier routes to correct handler
-- [ ] Coaching handler maintains multi-turn state
-- [ ] Request router correctly dispatches all intent types
-- [ ] Integration tests pass for each extractor
+- [x] All 5 extractors produce valid outputs
+- [x] Extraction orchestrator coordinates parallel extraction
+- [x] Intent classifier routes to correct handler
+- [x] Coaching handler maintains multi-turn state
+- [x] Request router correctly dispatches all intent types
+- [x] Integration tests pass for each extractor
 
 ---
 
 ## In Progress
 
-**Completed Groups A+B+C+D+E features (15/16). Next: Group F to complete Phase 4.**
+**Phase 4 COMPLETE (16/16 features). Ready for Phase 5 - Notifications.**
 
-Group F ready to implement:
-- AGT-002: Request Router (needs AGT-013 ✓, AGT-016 ✓, AGT-014 ✓)
+Phase 5 features to implement:
+- NTF-001: Notification Preferences
+- NTF-002: Email Notifications
+- NTF-003: Telegram Bot
+- NTF-004: Notification Routing
+- NTF-005: Daily Digest
+- NTF-006: Nudge Engine
+- NTF-007: Streak Tracking
 
 ---
 
@@ -254,6 +260,16 @@ Group F ready to implement:
 - `OrchestrationResult` includes needs_validation flag for UI
 - Artifacts: `backend/app/services/extraction_orchestrator.py`
 
+### AGT-002: Request Router
+- `IntentRouter` routes messages to appropriate handlers based on intent
+- `CommandHandler` for system commands (/start, /help, /clear, /status)
+- Routes: CAPTURE → ExtractionOrchestrator, COACHING → CoachingService, COMMAND → CommandHandler
+- `RouterResponse` unified response model with intent-specific content
+- API endpoints: `POST /api/ai/process`, `POST /api/ai/process/stream`
+- Supports forced intent for UI flows (skip classification)
+- Streaming only for COACHING; other intents return full result
+- Artifacts: `backend/app/services/intent_router.py`, updated `backend/app/routers/ai.py`
+
 ---
 
 ### SUB-001: Database Schema
@@ -378,4 +394,4 @@ Group F ready to implement:
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Complete Phase 4 - Implement AGT-002 (Request Router), then Phase 5 (Notifications)*
+*Next session should: Begin Phase 5 (Notifications) - Start with NTF-001 (Notification Preferences)*
