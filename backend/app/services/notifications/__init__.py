@@ -14,11 +14,30 @@ from app.services.notifications.base import (
     DeliveryResult,
     NotificationProvider,
 )
+from app.services.notifications.router import (
+    ChannelRouter,
+    NotificationPreferences,
+    UserChannelConfig,
+    get_channel_router,
+)
+from app.services.notifications.gateway import (
+    NotificationGateway,
+    get_notification_gateway,
+)
 
 __all__ = [
+    # Base types
     "NotificationChannel",
     "NotificationType",
     "NotificationPayload",
     "DeliveryResult",
     "NotificationProvider",
+    # Router
+    "ChannelRouter",
+    "NotificationPreferences",
+    "UserChannelConfig",
+    "get_channel_router",
+    # Gateway
+    "NotificationGateway",
+    "get_notification_gateway",
 ]

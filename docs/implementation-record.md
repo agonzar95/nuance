@@ -1,86 +1,73 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 4 - AI Layer (COMPLETE)
-- **Total Features:** 51 completed of 107 total
+- **Current Phase:** 5 - Notifications (COMPLETE)
+- **Total Features:** 58 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `df159e2` [PHASE-04] Group E - Extraction Orchestrator (15/16 features)
+- **Last Commit:** `62713d4` [PHASE-05] COMPLETE - Notification Infrastructure
 
 ---
 
-## Current Phase: Phase 4 - AI Layer
+## Current Phase: Phase 5 - Notifications
 
-**Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
+**Goal:** Build notification infrastructure for email and Telegram delivery.
 
-### Phase 4 Features (16/16 Complete)
+### Phase 5 Features (7/7 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
-| AGT-001 | Orchestrator Setup | DONE | Medium | A |
-| AGT-007 | Model Abstraction | DONE | Easy | A |
-| INF-007 | Intent Log Recording | DONE | Easy | A |
-| AGT-004 | Rate Limiting | DONE | Easy | B |
-| AGT-005 | Token Budgeting | DONE | Easy | B |
-| AGT-006 | SSE Streaming | DONE | Medium | B |
-| AGT-015 | Prompt Versioning | DONE | Easy | B |
-| AGT-008 | Extract: Actions | DONE | Medium | C |
-| AGT-009 | Extract: Avoidance Weight | DONE | Medium | C |
-| AGT-010 | Extract: Complexity | DONE | Easy | C |
-| AGT-012 | Extract: Breakdown | DONE | Medium | C |
-| AGT-013 | Intent Classifier | DONE | Easy | C |
-| AGT-011 | Extract: Confidence | DONE | Easy | D |
-| AGT-014 | Coaching Handler | DONE | Medium | D |
-| AGT-016 | Extraction Orchestrator | DONE | Medium | E |
-| AGT-002 | Request Router | DONE | Medium | F |
+| NTF-002 | Email Client (Resend) | DONE | Easy | A |
+| NTF-003 | Telegram Bot Setup | DONE | Easy | A |
+| NTF-004 | Telegram Send | DONE | Easy | A |
+| NTF-009 | Channel Router | DONE | Easy | B |
+| NTF-005 | Telegram Receive | DONE | Medium | C |
+| NTF-006 | Telegram Commands | DONE | Easy | C |
+| NTF-001 | Gateway Abstraction | DONE | Easy | D |
 
-### Phase 4 Validation Criteria
+### Phase 5 Validation Criteria
 
 | Criterion | Test | Status |
 |-----------|------|--------|
-| Orchestrator runs | Request/response cycle works | READY |
-| Model abstraction works | Claude calls succeed via abstraction | READY |
-| Rate limiting enforces | Requests beyond limit rejected | READY |
-| SSE streams | Client receives streaming tokens | READY |
-| Action extraction works | Text → structured actions | READY |
-| Avoidance detection works | High-avoidance tasks flagged | READY |
-| Breakdown works | Complex task → subtasks | READY |
-| Intent classification works | Message → intent label | READY |
-| Coaching responds | Multi-turn coaching dialogue works | READY |
-| Router routes | Different intents hit correct handlers | READY |
-| TypeScript passes | `tsc --noEmit` exits with 0 | PASS |
+| Email sends | Resend API called successfully | READY |
+| Telegram sends | Bot API sends messages | READY |
+| Webhook receives | Updates processed from Telegram | READY |
+| Commands work | /start, /help, /today, /status respond | READY |
+| Router routes | Notifications go to correct channel | READY |
+| Gateway unified | Single interface for all channels | READY |
 | Python types pass | `mypy` exits with 0 (excl. supabase lib) | PASS |
 
 ### Phase Gate
 
-**Phase 4 is complete when:**
-- [x] Orchestrator handles request/response cycle
-- [x] SSE streaming delivers tokens to client
-- [x] All 5 extractors produce valid outputs
-- [x] Extraction orchestrator coordinates parallel extraction
-- [x] Intent classifier routes to correct handler
-- [x] Coaching handler maintains multi-turn state
-- [x] Request router correctly dispatches all intent types
-- [x] Integration tests pass for each extractor
+**Phase 5 is complete when:**
+- [x] Email provider sends via Resend with retry logic
+- [x] Telegram provider sends messages via Bot API
+- [x] Webhook endpoint receives and processes Telegram updates
+- [x] Command handler responds to /start, /help, /today, /status
+- [x] Channel router determines correct channel per user preferences
+- [x] Gateway provides unified interface for all notification channels
+- [x] Types pass mypy validation
 
 ---
 
 ## In Progress
 
-**Phase 5 IN PROGRESS (0/7 features). Started notification infrastructure.**
+**Phase 6 TODO (0/10 features). Frontend API integration and PWA.**
 
-Phase 5 features:
-- NTF-002: Email Client (Resend) - IN PROGRESS (base types created)
-- NTF-003: Telegram Bot Setup - TODO
-- NTF-004: Telegram Send - TODO
-- NTF-005: Telegram Receive - TODO
-- NTF-006: Telegram Commands - TODO
-- NTF-009: Channel Router - TODO
-- NTF-001: Gateway Abstraction - TODO
+Phase 6 features (from 05_Implementation_Plan.md):
+- FE-001: API Client Setup
+- FE-002: Action CRUD Hooks
+- FE-003: Conversation Hooks
+- FE-004: Error Handling UI
+- FE-005: PWA Manifest
+- FE-006: Service Worker
+- Additional features TBD
 
-**Partial work created:**
-- `backend/app/services/notifications/__init__.py` - package init
-- `backend/app/services/notifications/base.py` - base types (NotificationChannel, NotificationType, NotificationPayload, DeliveryResult, NotificationProvider)
-- `backend/app/services/notifications/providers/__init__.py` - providers init (imports need completion)
+---
+
+## Completed: Phase 4 - AI Layer
+
+**Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
+**Status:** COMPLETE
 
 ---
 
@@ -398,5 +385,69 @@ Phase 5 features:
 
 ---
 
+### NTF-002: Email Client (Resend)
+- `EmailProvider` implements `NotificationProvider` interface
+- Wraps existing `ResendClient` from INT-005
+- Exponential backoff retry (3 retries, 2^attempt seconds)
+- HTML email formatting with type-specific templates (morning plan, EOD summary)
+- Gets user email via Supabase admin API
+- Artifacts: `backend/app/services/notifications/providers/email.py`
+
+### NTF-003: Telegram Bot Setup
+- `TelegramBotSetup` class for webhook configuration
+- `TelegramBotConfig` dataclass with bot_token, webhook_url, webhook_secret
+- Methods: verify_bot(), setup_webhook(), get_webhook_info(), delete_webhook()
+- Added `app_url` and `telegram_webhook_secret` to config settings
+- Artifacts: `backend/app/services/notifications/telegram/setup.py`, updated `backend/app/config.py`
+
+### NTF-004: Telegram Send Provider
+- `TelegramNotificationProvider` implements `NotificationProvider`
+- Wraps existing `TelegramClient` from INT-004
+- Markdown message formatting with type-specific templates
+- Gets chat_id from profiles table
+- Artifacts: `backend/app/services/notifications/providers/telegram.py`
+
+### NTF-005: Telegram Receive Handler
+- `TelegramHandler` processes incoming updates from webhook
+- `TelegramUpdate` dataclass parses message, chat_id, voice_file_id
+- Routes commands to `TelegramCommandHandler`
+- Looks up user by chat_id, processes capture via ExtractionOrchestrator
+- Supports voice transcription via INT-006
+- Saves extracted actions to database
+- Artifacts: `backend/app/services/notifications/telegram/handler.py`
+
+### NTF-006: Telegram Commands
+- `TelegramCommandHandler` handles /start, /help, /today, /status
+- /start: Welcome message, generates connection token for new users
+- /help: Shows available commands and usage examples
+- /today: Displays today's planned actions with completion status
+- /status: Shows progress stats (completed, time tracked, inbox count)
+- Artifacts: `backend/app/services/notifications/telegram/commands.py`
+
+### NTF-009: Channel Router
+- `ChannelRouter` determines which channel to use for notifications
+- `NotificationPreferences` and `UserChannelConfig` dataclasses
+- Reads preferences from profiles table (notification_channel, notification_enabled)
+- Falls back to available channel if preferred unavailable
+- get_available_channels() returns list of configured channels
+- Artifacts: `backend/app/services/notifications/router.py`
+
+### NTF-001: Gateway Abstraction
+- `NotificationGateway` provides unified interface
+- Methods: send(), send_to_channel(), send_to_all()
+- Routes via ChannelRouter based on user preferences
+- Registers providers at initialization
+- Factory function handles provider availability gracefully
+- Artifacts: `backend/app/services/notifications/gateway.py`
+
+### Telegram Router
+- FastAPI router at `/telegram` prefix
+- Webhook endpoint `POST /telegram/webhook` with secret token verification
+- Management endpoints: `/webhook/info`, `/webhook/setup`, `/bot/verify`
+- DELETE `/webhook` for removing webhook
+- Artifacts: `backend/app/routers/telegram.py`
+
+---
+
 *Last session ended: December 12, 2025*
-*Next session should: Continue Phase 5 - Complete NTF-002 (Email Provider), then NTF-003/NTF-004 (Telegram)*
+*Next session should: Start Phase 6 - Frontend API integration (FE-001, FE-002)*
