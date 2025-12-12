@@ -2,9 +2,9 @@
 
 import uuid
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import AsyncIterator, Callable, Awaitable
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -14,6 +14,8 @@ from app.logging_config import (
     configure_logging,
     get_logger,
 )
+from app.middleware import setup_exception_handlers
+from app.routers import transcription_router
 
 
 @asynccontextmanager
@@ -49,9 +51,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Setup exception handlers
+setup_exception_handlers(app)
+
 
 @app.middleware("http")
-async def request_context_middleware(request: Request, call_next):
+async def request_context_middleware(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
     """Middleware to add request ID to logging context."""
     request_id = str(uuid.uuid4())
     request.state.request_id = request_id
@@ -77,3 +85,7 @@ async def root() -> dict[str, str]:
 async def health() -> dict[str, str]:
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+# Include routers
+app.include_router(transcription_router)

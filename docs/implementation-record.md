@@ -1,10 +1,10 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 2 - Core Services (in progress)
-- **Total Features:** 22 completed of 107 total
+- **Current Phase:** 2 - Core Services (COMPLETE)
+- **Total Features:** 24 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `4fad8d7` [PHASE-02] Core Services - deployment configs and logging
+- **Last Commit:** `72e5bdc` [PHASE-02] Complete - Voice Transcription and Error Middleware
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Configure deployment and establish all external service integrations.
 
-### Phase 2 Features (10/12 Complete)
+### Phase 2 Features (12/12 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -26,14 +26,14 @@
 | INT-003 | Deepgram Client | DONE | Easy | C |
 | INT-004 | Telegram API Client | DONE | Easy | C |
 | INT-005 | Resend Client | DONE | Easy | C |
-| INT-006 | Voice Transcription | TODO | Medium | D |
-| INF-008 | Error Middleware | TODO | Easy | D |
+| INT-006 | Voice Transcription | DONE | Medium | D |
+| INF-008 | Error Middleware | DONE | Easy | D |
 
 ---
 
 ## In Progress
 
-*No features currently in progress. Ready to continue with INT-006 (Voice Transcription) and INF-008 (Error Middleware).*
+*Phase 2 complete. Ready to begin Phase 3 - Data Layer.*
 
 ---
 
@@ -188,7 +188,22 @@ All 12 features have no dependencies and can be built simultaneously:
 - Simple HTML-to-text fallback
 - Artifacts: `backend/app/clients/resend.py`
 
+### INT-006: Voice Transcription
+- Unified `TranscriptionService` handling web audio and Telegram voice notes
+- `transcribe_bytes()` for raw audio from MediaRecorder
+- `transcribe_telegram_voice()` downloads via Telegram client then transcribes
+- API endpoint: `POST /transcribe` for file upload, `POST /transcribe/telegram` for file_id
+- Artifacts: `backend/app/services/transcription.py`, `backend/app/routers/transcription.py`
+
+### INF-008: Error Middleware
+- Custom exception classes: `NotFoundError`, `ValidationError`, `AuthenticationError`, `AuthorizationError`, `ExternalServiceError`
+- Consistent `ErrorResponse` schema with error code, message, request_id, and details
+- Generic catch-all handler logs stack traces but returns sanitized errors to clients
+- Pydantic validation error handler extracts field-level errors
+- `setup_exception_handlers()` registers all handlers with FastAPI app
+- Artifacts: `backend/app/middleware/error_handler.py`, `backend/app/middleware/__init__.py`
+
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Create INT-006 (Voice Transcription service) and INF-008 (Error Middleware)*
+*Next session should: Begin Phase 3 - Data Layer (SUB-001 Database Schema, SUB-002 RLS Policies, etc.)*
