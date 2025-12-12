@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 4 - AI Layer (IN PROGRESS)
-- **Total Features:** 47 completed of 107 total
+- **Total Features:** 49 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `9d484ed` [PHASE-04] AI Layer - Groups A+B (7/16 features)
+- **Last Commit:** `424f7ea` [PHASE-04] Group C Extractors (12/16 features)
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete agentic infrastructure: orchestration, extractors, and handlers.
 
-### Phase 4 Features (12/16 Complete)
+### Phase 4 Features (14/16 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
@@ -28,8 +28,8 @@
 | AGT-010 | Extract: Complexity | DONE | Easy | C |
 | AGT-012 | Extract: Breakdown | DONE | Medium | C |
 | AGT-013 | Intent Classifier | DONE | Easy | C |
-| AGT-011 | Extract: Confidence | TODO | Easy | D |
-| AGT-014 | Coaching Handler | TODO | Medium | D |
+| AGT-011 | Extract: Confidence | DONE | Easy | D |
+| AGT-014 | Coaching Handler | DONE | Medium | D |
 | AGT-016 | Extraction Orchestrator | TODO | Medium | E |
 | AGT-002 | Request Router | TODO | Medium | F |
 
@@ -45,7 +45,7 @@
 | Avoidance detection works | High-avoidance tasks flagged | READY |
 | Breakdown works | Complex task → subtasks | READY |
 | Intent classification works | Message → intent label | READY |
-| Coaching responds | Multi-turn coaching dialogue works | TODO |
+| Coaching responds | Multi-turn coaching dialogue works | READY |
 | Router routes | Different intents hit correct handlers | TODO |
 | TypeScript passes | `tsc --noEmit` exits with 0 | PASS |
 | Python types pass | `mypy` exits with 0 (excl. supabase lib) | PASS |
@@ -66,17 +66,13 @@
 
 ## In Progress
 
-**Completed Groups A+B+C features (12/16). Next: Group D features.**
+**Completed Groups A+B+C+D features (14/16). Next: Group E and F.**
 
-Group D features ready to implement:
-- AGT-011: Extract Confidence (needs AGT-008 ✓)
-- AGT-014: Coaching Handler (needs AGT-007 ✓, AGT-006 ✓)
+Group E ready to implement:
+- AGT-016: Extraction Orchestrator (needs AGT-008 ✓, AGT-009 ✓, AGT-010 ✓, AGT-011 ✓)
 
-Then Group E:
-- AGT-016: Extraction Orchestrator (needs AGT-008 ✓, AGT-009 ✓, AGT-010 ✓, AGT-011)
-
-Finally Group F:
-- AGT-002: Request Router (needs AGT-013 ✓, AGT-016, AGT-014)
+Then Group F:
+- AGT-002: Request Router (needs AGT-013 ✓, AGT-016, AGT-014 ✓)
 
 ---
 
@@ -240,6 +236,20 @@ Finally Group F:
 - Falls back to AI classification for ambiguous cases
 - Artifacts: `backend/app/services/intent.py`
 
+### AGT-011: Extract Confidence
+- `ConfidenceService` scores extraction confidence from 0.0-1.0
+- `ConfidenceAnalysis` model with confidence, ambiguities, reasoning
+- Heuristic scoring: action verbs (+), vague patterns (-), short titles (-)
+- Falls back to AI for complex cases below 0.6 confidence
+- Artifacts: `backend/app/services/confidence.py`
+
+### AGT-014: Coaching Handler
+- `CoachingService` provides empathetic multi-turn conversations
+- `CoachingConversation` manages conversation history per user/task
+- Supports both `process()` (full response) and `stream()` (SSE)
+- Principles: validate feelings, normalize struggles, suggest tiny steps, no shame
+- Artifacts: `backend/app/services/coaching.py`
+
 ---
 
 ### SUB-001: Database Schema
@@ -364,4 +374,4 @@ Finally Group F:
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Continue Phase 4 - Implement Group D (AGT-011, AGT-014), then Group E (AGT-016), then Group F (AGT-002)*
+*Next session should: Continue Phase 4 - Implement Group E (AGT-016), then Group F (AGT-002) to complete Phase 4*

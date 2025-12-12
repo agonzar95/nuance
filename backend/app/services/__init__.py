@@ -28,6 +28,17 @@ from app.services.intent import (
     Intent,
     get_intent_classifier,
 )
+from app.services.confidence import (
+    ConfidenceService,
+    ConfidenceAnalysis,
+    get_confidence_service,
+)
+from app.services.coaching import (
+    CoachingService,
+    CoachingConversation,
+    CoachingResponse,
+    get_coaching_service,
+)
 from app.services.token_budget import (
     TokenBudgetService,
     BudgetStatus,
@@ -65,6 +76,15 @@ __all__ = [
     "IntentResult",
     "Intent",
     "get_intent_classifier",
+    # Confidence (AGT-011)
+    "ConfidenceService",
+    "ConfidenceAnalysis",
+    "get_confidence_service",
+    # Coaching (AGT-014)
+    "CoachingService",
+    "CoachingConversation",
+    "CoachingResponse",
+    "get_coaching_service",
     # Token Budget (AGT-005)
     "TokenBudgetService",
     "BudgetStatus",
