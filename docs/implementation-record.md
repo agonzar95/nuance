@@ -1,48 +1,46 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 1 - Foundation (COMPLETE)
-- **Total Features:** 12 completed of 107 total
+- **Current Phase:** 2 - Core Services (in progress)
+- **Total Features:** 17 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** Pending - Phase 1 complete
+- **Last Commit:** `f38cbed` [PHASE-01] Foundation complete
+
+---
+
+## Current Phase: Phase 2 - Core Services
+
+**Goal:** Configure deployment and establish all external service integrations.
+
+### Phase 2 Features (5/12 Complete)
+
+| ID | Feature | Status | Complexity | Parallel Group |
+|----|---------|--------|------------|----------------|
+| INF-003 | Vercel Config | DONE | Easy | A |
+| INF-004 | Railway Config | DONE | Easy | A |
+| INF-005 | Environment Config | DONE | Easy | A |
+| INF-006 | Structured Logging | DONE | Easy | B |
+| INF-011 | CORS Configuration | DONE | Easy | B |
+| INT-001 | Supabase Client | TODO | Easy | C |
+| INT-002 | Claude API Client | TODO | Easy | C |
+| INT-003 | Deepgram Client | TODO | Easy | C |
+| INT-004 | Telegram API Client | TODO | Easy | C |
+| INT-005 | Resend Client | TODO | Easy | C |
+| INT-006 | Voice Transcription | TODO | Medium | D |
+| INF-008 | Error Middleware | TODO | Easy | D |
 
 ---
 
 ## In Progress
 
-*Phase 1 complete! All features awaiting commit.*
-
-### Phase 1 Completed (Awaiting Commit)
-
-**Group A - Infrastructure (INF-001, INF-002):** Previously completed
-
-**Group B - UI Components:**
-- FE-007: Avoidance Indicator - `frontend/src/components/ui/AvoidanceIndicator.tsx`
-- FE-008: Timer Component - `frontend/src/components/ui/Timer.tsx`
-- FE-009: Loading States - `frontend/src/components/ui/Loading.tsx`
-- FE-010: Empty States - `frontend/src/components/ui/EmptyState.tsx`
-- FE-011: Offline Awareness - `frontend/src/hooks/useOffline.ts`, `frontend/src/components/ui/OfflineBanner.tsx`
-
-**Group C - Input Components:**
-- CAP-002: Chat Text Input - `frontend/src/components/chat/ChatInput.tsx`
-- CAP-006: Correction Flow - `frontend/src/components/capture/ActionEditForm.tsx`
-
-**Group D - Execution Components:**
-- EXE-003: Subtask Checklist - `frontend/src/components/execution/SubtaskChecklist.tsx`
-- EXE-011: Avoidance Acknowledgment - `frontend/src/components/execution/AvoidanceAcknowledgment.tsx`
-
-**Group E - Planning Components:**
-- PLN-006: Time Budget Display - `frontend/src/components/planning/TimeBudget.tsx`
-
-**Supporting files:**
-- `frontend/src/components/ui/index.ts` - barrel export
-- Installed dependencies: `clsx`, `tailwind-merge`
+*Session ended - ready to continue with INT-001 through INT-005 (API clients).*
 
 ---
 
-## Current Phase: Phase 1 - Foundation
+## Completed: Phase 1 - Foundation
 
 **Goal:** Establish zero-dependency base components that all other features build upon.
+**Status:** COMPLETE - Committed `f38cbed`, pushed to origin/main
 
 ### Phase 1 Features (12/12 Complete)
 
@@ -128,7 +126,39 @@ All 12 features have no dependencies and can be built simultaneously:
 - Config loads from `.env` file with defaults for development
 - Artifacts: `backend/` directory with FastAPI setup
 
+### INF-003: Vercel Config
+- Created `frontend/vercel.json` with Next.js framework preset
+- Environment variable references: @supabase-url, @supabase-anon-key, @api-url
+- Security headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy
+- Artifacts: `frontend/vercel.json`
+
+### INF-004: Railway Config
+- Created `backend/Dockerfile` with Python 3.11-slim base
+- Created `backend/railway.toml` with health check and restart policies
+- Non-root user for security, PORT env var for Railway
+- Artifacts: `backend/Dockerfile`, `backend/railway.toml`
+
+### INF-005: Environment Config
+- Created `.env.example` files for both frontend and backend
+- Documented all required environment variables with comments
+- Added Python-specific entries to `.gitignore`
+- Added `resend_from_email` and helper properties to Settings
+- Artifacts: `backend/.env.example`, `frontend/.env.example`
+
+### INF-006: Structured Logging
+- Created `backend/app/logging_config.py` using structlog
+- Development: colored console output, Production: JSON output
+- Request ID middleware injects request_id into all log entries
+- Added X-Request-ID header to all responses
+- Added lifespan handler for startup/shutdown logging
+- Artifacts: `backend/app/logging_config.py`, updated `backend/app/main.py`
+
+### INF-011: CORS Configuration
+- Already configured in Phase 1, validated working
+- ALLOWED_ORIGINS env var supports comma-separated list
+- Artifacts: Already in `backend/app/main.py`
+
 ---
 
 *Last session ended: December 12, 2025*
-*Next session should: Commit Phase 1, then begin Phase 2 - Core Services*
+*Next session should: Create API clients (INT-001 through INT-005), then INT-006 and INF-008*
