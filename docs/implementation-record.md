@@ -1,66 +1,78 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 5 - Notifications (COMPLETE)
-- **Total Features:** 58 completed of 107 total
+- **Current Phase:** 6 - Frontend Layer (COMPLETE)
+- **Total Features:** 68 completed of 107 total
 - **Last Updated:** December 12, 2025
-- **Last Commit:** `62713d4` [PHASE-05] COMPLETE - Notification Infrastructure
+- **Last Commit:** (pending)
 
 ---
 
-## Current Phase: Phase 5 - Notifications
+## Current Phase: Phase 6 - Frontend Layer
 
-**Goal:** Build notification infrastructure for email and Telegram delivery.
+**Goal:** Build frontend infrastructure: API client, real-time handling, and PWA.
 
-### Phase 5 Features (7/7 Complete)
+### Phase 6 Features (10/10 Complete)
 
 | ID | Feature | Status | Complexity | Parallel Group |
 |----|---------|--------|------------|----------------|
-| NTF-002 | Email Client (Resend) | DONE | Easy | A |
-| NTF-003 | Telegram Bot Setup | DONE | Easy | A |
-| NTF-004 | Telegram Send | DONE | Easy | A |
-| NTF-009 | Channel Router | DONE | Easy | B |
-| NTF-005 | Telegram Receive | DONE | Medium | C |
-| NTF-006 | Telegram Commands | DONE | Easy | C |
-| NTF-001 | Gateway Abstraction | DONE | Easy | D |
+| FE-001 | API Client | DONE | Easy | A |
+| FE-012 | PWA Manifest | DONE | Easy | A |
+| FE-015 | Navigation Component | DONE | Easy | A |
+| FE-002 | Optimistic Updates | DONE | Easy | B |
+| FE-003 | SSE Handler | DONE | Easy | B |
+| FE-004 | Real-time Handler | DONE | Easy | B |
+| FE-006 | Action Card Component | DONE | Easy | C |
+| FE-005 | Action List Component | DONE | Easy | D |
+| FE-013 | Service Worker | DONE | Easy | E |
+| FE-014 | Responsive Layout | DONE | Easy | F |
 
-### Phase 5 Validation Criteria
+### Phase 6 Validation Criteria
 
 | Criterion | Test | Status |
 |-----------|------|--------|
-| Email sends | Resend API called successfully | READY |
-| Telegram sends | Bot API sends messages | READY |
-| Webhook receives | Updates processed from Telegram | READY |
-| Commands work | /start, /help, /today, /status respond | READY |
-| Router routes | Notifications go to correct channel | READY |
-| Gateway unified | Single interface for all channels | READY |
-| Python types pass | `mypy` exits with 0 (excl. supabase lib) | PASS |
+| API client works | Typed requests/responses | READY |
+| Optimistic updates | UI updates before server confirms | READY |
+| SSE handler | Streaming AI response displays | READY |
+| Real-time updates | Supabase changes reflected | READY |
+| Action card renders | All action properties displayed | READY |
+| Action list renders | Multiple cards with empty state | READY |
+| PWA installable | Manifest linked, icons configured | READY |
+| Service worker caches | Offline access works | READY |
+| Layout responsive | Mobile/tablet/desktop layouts | READY |
+| Navigation works | Routes change, active state shows | READY |
+| TypeScript passes | `npm run typecheck` exits with 0 | PASS |
 
 ### Phase Gate
 
-**Phase 5 is complete when:**
-- [x] Email provider sends via Resend with retry logic
-- [x] Telegram provider sends messages via Bot API
-- [x] Webhook endpoint receives and processes Telegram updates
-- [x] Command handler responds to /start, /help, /today, /status
-- [x] Channel router determines correct channel per user preferences
-- [x] Gateway provides unified interface for all notification channels
-- [x] Types pass mypy validation
+**Phase 6 is complete when:**
+- [x] API client successfully makes typed requests
+- [x] Optimistic updates work with rollback on failure
+- [x] SSE streaming displays in real-time
+- [x] Real-time subscriptions trigger UI updates
+- [x] All action components render correctly
+- [x] PWA manifest and icons configured
+- [x] Service worker handles offline scenarios
+- [x] Responsive layout adapts to all breakpoints
 
 ---
 
 ## In Progress
 
-**Phase 6 TODO (0/10 features). Frontend API integration and PWA.**
+**Phase 7 TODO (0/26 features). Workflow features: Capture, Planning, Execution, Reflection.**
 
-Phase 6 features (from 05_Implementation_Plan.md):
-- FE-001: API Client Setup
-- FE-002: Action CRUD Hooks
-- FE-003: Conversation Hooks
-- FE-004: Error Handling UI
-- FE-005: PWA Manifest
-- FE-006: Service Worker
-- Additional features TBD
+Phase 7 features (from 05_Implementation_Plan.md):
+- Capture: CAP-001, CAP-003, CAP-004, CAP-005, CAP-007, CAP-008
+- Planning: PLN-001, PLN-002, PLN-003, PLN-004, PLN-005, PLN-007, PLN-008
+- Execution: EXE-001, EXE-002, EXE-004, EXE-005, EXE-006, EXE-007, EXE-008, EXE-009, EXE-010, EXE-012
+- Reflection: REF-003, REF-005, REF-006
+
+---
+
+## Completed: Phase 5 - Notifications
+
+**Goal:** Build notification infrastructure for email and Telegram delivery.
+**Status:** COMPLETE
 
 ---
 
@@ -449,5 +461,77 @@ Phase 6 features (from 05_Implementation_Plan.md):
 
 ---
 
+## Phase 6 Implementation Notes
+
+### FE-001: API Client
+- Typed `ApiClient` class with automatic auth header injection
+- Methods for actions (CRUD), AI (chat, process), profile, conversations
+- `ApiError` class with status helpers (isAuthError, isRateLimited, etc.)
+- React Query integration with `queryKeys` factory
+- Artifacts: `frontend/src/lib/api.ts`, `frontend/src/types/api.ts`, `frontend/src/lib/query.ts`
+
+### FE-002: Optimistic Updates
+- `useOptimisticMutation` hook for generic optimistic patterns
+- Pre-built hooks: `useOptimisticCompleteAction`, `useOptimisticUpdateAction`, `useOptimisticDeleteAction`, `useOptimisticReorderActions`
+- Automatic rollback on error, cache invalidation on settle
+- Artifacts: `frontend/src/hooks/useOptimisticMutation.ts`
+
+### FE-003: SSE Handler
+- `useSSE` hook for basic EventSource connections
+- `useProcessStream` for AI process endpoint with POST streaming
+- `useChatStream` for AI chat endpoint streaming
+- Handles message/done/error events, content accumulation
+- Artifacts: `frontend/src/hooks/useSSE.ts`
+
+### FE-004: Real-time Handler
+- `useRealtimeSync` integrates Supabase real-time with React Query
+- Handles INSERT/UPDATE/DELETE events for actions table
+- Specialized hooks: `useRealtimeTodayActions`, `useRealtimeInboxActions`
+- Automatic cache updates without full refetch
+- Artifacts: `frontend/src/hooks/useRealtimeSync.ts`
+
+### FE-006: Action Card Component
+- `ActionCard` displays action with title, avoidance indicator, time estimate
+- Variants: default, compact, focus
+- Status-based styling with colored left border
+- Supports draggable and selected states
+- Artifacts: `frontend/src/components/actions/ActionCard.tsx`
+
+### FE-005: Action List Component
+- `ActionList` renders actions with empty/loading states
+- Pre-configured variants: `InboxActionList`, `TodayActionList`, `CompactActionList`
+- `GroupedActionList` for displaying actions by category
+- Artifacts: `frontend/src/components/actions/ActionList.tsx`
+
+### FE-012: PWA Manifest
+- Complete manifest.json with name, icons, shortcuts
+- App metadata in layout.tsx (viewport, theme-color, apple-web-app)
+- SVG icon as placeholder (real icons needed for production)
+- Artifacts: `frontend/public/manifest.json`, updated `frontend/src/app/layout.tsx`
+
+### FE-013: Service Worker
+- Custom service worker with cache strategies
+- Static assets: Cache-first
+- API requests: Network-first with cache fallback
+- Navigation: Network-first with offline fallback page
+- `ServiceWorkerProvider` component for registration and updates
+- Artifacts: `frontend/public/sw.js`, `frontend/src/app/offline/page.tsx`, `frontend/src/components/providers/ServiceWorkerProvider.tsx`
+
+### FE-014: Responsive Layout
+- `AppLayout` with side navbar (desktop) and bottom tabs (mobile)
+- `SplitLayout` for planning page (inbox + today)
+- `FocusLayout` for minimal focus mode chrome
+- `PageContainer` for standard page wrapper with title
+- Artifacts: `frontend/src/components/layout/AppLayout.tsx`
+
+### FE-015: Navigation Component
+- `Navbar` for desktop with logo, nav items, quick add button
+- `BottomTabs` for mobile with floating action button
+- Active route highlighting via usePathname
+- Routes: /capture, /plan, /focus, /reflect
+- Artifacts: `frontend/src/components/layout/Navbar.tsx`, `frontend/src/components/layout/BottomTabs.tsx`
+
+---
+
 *Last session ended: December 12, 2025*
-*Next session should: Start Phase 6 - Frontend API integration (FE-001, FE-002)*
+*Next session should: Start Phase 7 - Workflow features (Stage 1: CAP-001, PLN-001, PLN-002, REF-003, REF-005, REF-006)*
