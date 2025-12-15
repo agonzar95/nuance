@@ -26,6 +26,7 @@ import {
   ApiError,
   ApiErrorData,
   TranscriptionResponse,
+  BreakdownResult,
 } from '@/types/api'
 
 // ============================================================================
@@ -231,6 +232,15 @@ class ApiClient {
     return this.request('GET', '/api/ai/status')
   }
 
+  /**
+   * Get breakdown suggestions for a task (EXE-006)
+   */
+  async getBreakdown(taskTitle: string): Promise<BreakdownResult> {
+    return this.request<BreakdownResult>('POST', '/api/ai/breakdown', {
+      body: { task_title: taskTitle },
+    })
+  }
+
   // ==========================================================================
   // Profile
   // ==========================================================================
@@ -369,6 +379,7 @@ export const api = {
       chat: client.chat.bind(client),
       process: client.process.bind(client),
       status: client.getAiStatus.bind(client),
+      breakdown: client.getBreakdown.bind(client),
     }
   },
 

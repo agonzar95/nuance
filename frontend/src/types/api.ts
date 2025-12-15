@@ -250,3 +250,19 @@ export class ApiError extends Error {
 export interface TranscriptionResponse {
   text: string
 }
+
+// ============================================================================
+// Breakdown Types (EXE-006)
+// ============================================================================
+
+export interface BreakdownStep {
+  title: string
+  estimated_minutes: number
+  is_physical: boolean
+}
+
+export interface BreakdownResult {
+  steps: BreakdownStep[]
+  first_step_emphasis: string
+  total_estimated_minutes: number
+}

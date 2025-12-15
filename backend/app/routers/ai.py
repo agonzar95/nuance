@@ -25,6 +25,17 @@ from app.services.intent_router import (
     RouterResponse,
     get_intent_router,
 )
+from app.services.breakdown import (
+    BreakdownService,
+    BreakdownResult,
+    get_breakdown_service,
+)
+from app.services.token_budget import (
+    TokenBudgetService,
+    TokenUsage,
+    get_token_budget_service,
+)
+from app.services.intent_logger import log_intent
 
 logger = structlog.get_logger()
 
@@ -139,33 +150,74 @@ async def chat(
     request: ChatRequest,
     user: CurrentUser,
     rate_limit: RateLimit,
-    claude: ClaudeClient = Depends(get_claude),
 ) -> ChatResponse:
     """Process a chat message through Claude.
 
     Requires authentication. Returns the assistant's response along with
-    token usage information.
+    token usage information. Tracks token usage and logs the interaction.
     """
+    import time
+
+    start_time = time.time()
+
     logger.info(
         "Processing chat request",
         user_id=user.id,
         message_count=len(request.messages),
     )
 
-    # Convert Pydantic models to dicts for Claude client
-    messages = [{"role": m.role, "content": m.content} for m in request.messages]
+    # Check token budget before making the call
+    budget_service = get_token_budget_service()
+    budget_status = await budget_service.check_budget(user.id)
 
-    # For now, return basic response - full implementation in AGT-006 (SSE Streaming)
-    response = claude.chat(
+    if not budget_status.has_budget:
+        raise RateLimitError(
+            retry_after=3600,  # Try again in an hour
+            limit_type="token_budget",
+        )
+
+    if budget_status.warning:
+        logger.warning(
+            "User approaching token budget limit",
+            user_id=user.id,
+            percentage_used=budget_status.percentage_used,
+        )
+
+    # Use AIProvider for proper token tracking
+    ai = get_ai_provider()
+    messages = [AIMessage(role=m.role, content=m.content) for m in request.messages]
+
+    response = await ai.complete(
         messages=messages,
         system=request.system,
     )
 
-    # Token counting will be enhanced in AGT-005 (Token Budgeting)
+    # Record token usage (async, non-blocking on failure)
+    await budget_service.record_usage(
+        user_id=user.id,
+        usage=TokenUsage(
+            input_tokens=response.input_tokens,
+            output_tokens=response.output_tokens,
+            endpoint="/api/ai/chat",
+        ),
+    )
+
+    # Log the intent (async, non-blocking on failure)
+    processing_time_ms = int((time.time() - start_time) * 1000)
+    await log_intent(
+        user_id=user.id,
+        raw_input=request.messages[-1].content if request.messages else "",
+        classified_intent="chat",
+        ai_response=response.content,
+        input_tokens=response.input_tokens,
+        output_tokens=response.output_tokens,
+        processing_time_ms=processing_time_ms,
+    )
+
     return ChatResponse(
-        content=response,
-        input_tokens=0,  # Placeholder until token tracking implemented
-        output_tokens=0,
+        content=response.content,
+        input_tokens=response.input_tokens,
+        output_tokens=response.output_tokens,
     )
 
 
@@ -417,3 +469,48 @@ async def process_stream(
             }
 
     return EventSourceResponse(event_generator())
+
+
+# ============================================================================
+# Breakdown Endpoint (EXE-006)
+# ============================================================================
+
+
+class BreakdownRequest(BaseModel):
+    """Request body for breakdown endpoint."""
+
+    task_title: str = Field(..., min_length=1, description="Task title to break down")
+
+
+@router.post("/breakdown", response_model=BreakdownResult)
+async def breakdown(
+    request: BreakdownRequest,
+    user: CurrentUser,
+    rate_limit: RateLimit,
+    breakdown_service: BreakdownService = Depends(get_breakdown_service),
+) -> BreakdownResult:
+    """Break down a complex task into micro-steps.
+
+    Returns 3-5 suggested first steps that are:
+    - PHYSICAL: involve body movement, not just thinking
+    - IMMEDIATE: can start right now
+    - TINY: each takes 2-10 minutes max
+
+    Used by EXE-006 First Step Suggestions to help users start
+    overwhelming tasks.
+    """
+    logger.info(
+        "Breaking down task",
+        user_id=user.id,
+        task_title=request.task_title[:50],
+    )
+
+    result = await breakdown_service.breakdown(request.task_title)
+
+    logger.info(
+        "Breakdown complete",
+        user_id=user.id,
+        step_count=len(result.steps),
+    )
+
+    return result

@@ -88,4 +88,7 @@ export const queryKeys = {
   ai: {
     status: ['ai', 'status'] as const,
   },
+
+  // Breakdown (EXE-006)
+  breakdown: (taskTitle: string) => ['breakdown', taskTitle] as const,
 } as const
