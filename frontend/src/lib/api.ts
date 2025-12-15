@@ -25,6 +25,7 @@ import {
   Message,
   ApiError,
   ApiErrorData,
+  TranscriptionResponse,
 } from '@/types/api'
 
 // ============================================================================
@@ -284,6 +285,37 @@ class ApiClient {
       { body: { content } }
     )
   }
+
+  // ==========================================================================
+  // Transcription
+  // ==========================================================================
+
+  /**
+   * Transcribe audio to text
+   */
+  async transcribe(audioBlob: Blob): Promise<TranscriptionResponse> {
+    const token = await this.config.getToken()
+    const formData = new FormData()
+    formData.append('audio', audioBlob, 'recording.webm')
+
+    const response = await fetch(`${this.config.baseUrl}/transcribe`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    })
+
+    if (!response.ok) {
+      let errorData: ApiErrorData
+      try {
+        errorData = await response.json()
+      } catch {
+        errorData = { error: `HTTP ${response.status}: ${response.statusText}` }
+      }
+      throw new ApiError(response.status, errorData)
+    }
+
+    return response.json()
+  }
 }
 
 // ============================================================================
@@ -354,6 +386,13 @@ export const api = {
       create: client.createConversation.bind(client),
       messages: client.getMessages.bind(client),
       send: client.sendMessage.bind(client),
+    }
+  },
+
+  get transcription() {
+    const client = getApiClient()
+    return {
+      transcribe: client.transcribe.bind(client),
     }
   },
 }

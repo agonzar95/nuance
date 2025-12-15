@@ -242,3 +242,11 @@ export class ApiError extends Error {
     return this.status === 422
   }
 }
+
+// ============================================================================
+// Transcription Types
+// ============================================================================
+
+export interface TranscriptionResponse {
+  text: string
+}

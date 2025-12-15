@@ -2,21 +2,25 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { VoiceInput } from './VoiceInput'
 
 interface ChatInputProps {
   onSend: (content: string) => void
   disabled?: boolean
   placeholder?: string
   maxLength?: number
+  showVoiceInput?: boolean
 }
 
 export function ChatInput({
   onSend,
   disabled = false,
   placeholder = "What's on your mind?",
-  maxLength = 2000
+  maxLength = 2000,
+  showVoiceInput = true,
 }: ChatInputProps) {
   const [value, setValue] = useState('')
+  const [isRecording, setIsRecording] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -28,11 +32,23 @@ export function ChatInput({
 
   const handleSend = () => {
     const trimmed = value.trim()
-    if (trimmed && !disabled) {
+    if (trimmed && !disabled && !isRecording) {
       onSend(trimmed)
       setValue('')
       textareaRef.current?.focus()
     }
+  }
+
+  const handleTranscription = (text: string) => {
+    // Append transcribed text to existing value (with space if needed)
+    setValue((prev) => {
+      const trimmedPrev = prev.trim()
+      if (trimmedPrev) {
+        return `${trimmedPrev} ${text}`.slice(0, maxLength)
+      }
+      return text.slice(0, maxLength)
+    })
+    textareaRef.current?.focus()
   }
 
   // Auto-resize textarea
@@ -46,24 +62,31 @@ export function ChatInput({
   return (
     <div className="border-t p-4 bg-background">
       <div className="flex gap-2 items-end">
+        {showVoiceInput && (
+          <VoiceInput
+            onTranscription={handleTranscription}
+            disabled={disabled}
+            onRecordingChange={setIsRecording}
+          />
+        )}
         <textarea
           ref={textareaRef}
           value={value}
           onChange={(e) => setValue(e.target.value.slice(0, maxLength))}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
-          disabled={disabled}
+          placeholder={isRecording ? 'Recording...' : placeholder}
+          disabled={disabled || isRecording}
           rows={1}
           className={cn(
             'flex-1 resize-none rounded-lg border p-3',
             'focus:outline-none focus:ring-2 focus:ring-primary',
             'max-h-32 overflow-y-auto',
-            disabled && 'opacity-50 cursor-not-allowed'
+            (disabled || isRecording) && 'opacity-50 cursor-not-allowed'
           )}
         />
         <button
           onClick={handleSend}
-          disabled={disabled || !value.trim()}
+          disabled={disabled || !value.trim() || isRecording}
           className={cn(
             'p-3 rounded-lg bg-primary text-primary-foreground',
             'disabled:opacity-50 disabled:cursor-not-allowed'

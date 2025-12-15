@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 7 - Workflow Features (IN PROGRESS)
-- **Total Features:** 79 completed of 107 total
+- **Total Features:** 90 completed of 107 total
 - **Last Updated:** December 15, 2025
-- **Last Commit:** `425216d` [PHASE-07] Stage 1 - Workflow Foundation Components
+- **Last Commit:** `3361fca` [PHASE-07] Stage 3 + Stage 4 - Capture & Planning Completions
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete user workflows: Capture, Planning, Execution, Reflection.
 
-### Phase 7 Features (11/26 Complete)
+### Phase 7 Features (22/26 Complete)
 
 #### Stage 1 - Foundation Components (6/6 Complete)
 
@@ -34,35 +34,35 @@
 | EXE-005 | Breakdown Prompt | DONE | Easy | EXE-003 |
 | EXE-012 | Rest Screen | DONE | Easy | EXE-001 |
 
-#### Stage 3 - Capture Completions (0/5 Pending)
+#### Stage 3 - Capture Completions (5/5 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
-| CAP-003 | Chat Voice Input | TODO | Medium | INT-003, INT-006 |
-| CAP-004 | Ghost Card | TODO | Easy | FE-006, AGT-016 |
-| CAP-005 | Confidence Validation | TODO | Easy | AGT-016, CAP-006 |
-| CAP-007 | Voice Error Handling | TODO | Easy | CAP-003 |
-| CAP-008 | Quick Capture Overlay | TODO | Easy | EXE-001 |
+| CAP-003 | Chat Voice Input | DONE | Medium | INT-003, INT-006 |
+| CAP-004 | Ghost Card | DONE | Easy | FE-006, AGT-016 |
+| CAP-005 | Confidence Validation | DONE | Easy | AGT-016, CAP-006 |
+| CAP-007 | Voice Error Handling | DONE | Easy | CAP-003 |
+| CAP-008 | Quick Capture Overlay | DONE | Easy | EXE-001 |
 
-#### Stage 4 - Planning Completions (0/5 Pending)
+#### Stage 4 - Planning Completions (5/5 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
-| PLN-003 | Drag to Plan | TODO | Easy | PLN-001, PLN-002 |
-| PLN-004 | Reorder Tasks | TODO | Easy | PLN-002, FE-002 |
-| PLN-005 | Day Commit | TODO | Easy | PLN-002, EXE-001 |
-| PLN-007 | Add More Tasks | TODO | Easy | CAP-002, FE-005 |
-| PLN-008 | Remove from Today | TODO | Easy | PLN-002, FE-002 |
+| PLN-003 | Drag to Plan | DONE | Easy | PLN-001, PLN-002 |
+| PLN-004 | Reorder Tasks | DONE | Easy | PLN-002, FE-002 |
+| PLN-005 | Day Commit | DONE | Easy | PLN-002, EXE-001 |
+| PLN-007 | Add More Tasks | DONE | Easy | CAP-002, FE-005 |
+| PLN-008 | Remove from Today | DONE | Easy | PLN-002, FE-002 |
 
-#### Stage 5 - Execution Completions (1/6 Pending)
+#### Stage 5 - Execution Completions (2/6 In Progress)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
 | EXE-004 | Focus Timer | DONE | Easy | FE-008 |
+| EXE-007 | Stuck Button | DONE | Easy | EXE-008 |
 | EXE-006 | First Step Suggestions | TODO | Medium | AGT-012 |
-| EXE-009 | Coaching Overlay | TODO | Medium | AGT-014, CAP-001 |
 | EXE-008 | Stuck Options | TODO | Easy | EXE-005, EXE-009 |
-| EXE-007 | Stuck Button | TODO | Easy | EXE-008 |
+| EXE-009 | Coaching Overlay | TODO | Medium | AGT-014, CAP-001 |
 | EXE-010 | Complete Task Flow | TODO | Easy | EXE-011, EXE-012 |
 
 ### Phase 7 Validation Criteria
@@ -79,6 +79,16 @@
 | Focus mode container | Full-screen with timer and exit confirm | READY |
 | Breakdown prompt | Prompts for first step on complex tasks | READY |
 | Rest screen | Calming break screen with countdown | READY |
+| Voice input | Record audio, transcribe, insert into input | READY |
+| Ghost card | Shimmer during extraction, transform to card | READY |
+| Confidence validation | Low confidence shows confirm/edit prompt | READY |
+| Voice error handling | Clear error messages with retry option | READY |
+| Quick capture overlay | Minimal overlay during focus mode | READY |
+| Drag to plan | Drag from inbox to today zone | READY |
+| Reorder tasks | Drag to reorder within today | READY |
+| Day commit | Start day navigates to focus | READY |
+| Add more tasks | Dialog to quick capture or browse | READY |
+| Remove from today | X button removes action | READY |
 | TypeScript passes | `npm run typecheck` exits with 0 | PASS |
 
 ---
@@ -640,12 +650,81 @@
 - Non-pressuring, guilt-free messaging
 - Artifacts: `frontend/src/components/execution/RestScreen.tsx`
 
+### CAP-003: Chat Voice Input
+- `VoiceInput` component with MediaRecorder API
+- Records audio, sends to `/transcribe` endpoint
+- Displays recording duration indicator
+- Integrated into `ChatInput` with `showVoiceInput` prop
+- Added `transcribe` method to API client
+- Artifacts: `frontend/src/components/chat/VoiceInput.tsx`, updated `frontend/src/lib/api.ts`
+
+### CAP-007: Voice Error Handling
+- Error types: permission, transcription, network, unsupported
+- Clear error messages with retry option
+- Permission denied shows settings guidance
+- Integrated into VoiceInput component
+- Artifacts: Integrated in `frontend/src/components/chat/VoiceInput.tsx`
+
+### CAP-004: Ghost Card
+- `GhostCard` component for extraction feedback
+- Shimmer animation during "extracting" status
+- Transforms to ActionCard when "extracted"
+- Error state with dismiss option
+- `GhostCardList` for multiple pending extractions
+- Artifacts: `frontend/src/components/capture/GhostCard.tsx`
+
+### CAP-005: Confidence Validation
+- `ConfidenceValidation` component for low-confidence extractions
+- Shows extracted actions with confirm/edit options
+- Displays ambiguities list
+- `SingleActionValidation` for simpler single-action case
+- Confidence threshold: 0.7
+- Artifacts: `frontend/src/components/capture/ConfidenceValidation.tsx`
+
+### CAP-008: Quick Capture Overlay
+- `QuickCaptureOverlay` for focus mode quick thoughts
+- Minimal overlay with text input
+- Auto-close after save with "Saved to inbox" confirmation
+- `QuickCaptureTrigger` button component
+- Position options: top-right, bottom-right, center
+- Artifacts: `frontend/src/components/capture/QuickCaptureOverlay.tsx`
+
+### PLN-003: Drag to Plan & PLN-004: Reorder Tasks
+- `PlanningLayout` component with DragDropContext
+- Droppable zones for inbox and today
+- Drag from inbox to today adds action to plan
+- Drag from today to inbox removes action
+- Drag within today reorders (PLN-004)
+- Artifacts: `frontend/src/components/planning/PlanningLayout.tsx`
+
+### PLN-005: Day Commit
+- `useDayCommit` hook for committing to day's plan
+- Updates action status to 'planned' with today's date
+- Navigates to focus mode with first action
+- Tracks isCommitting and canCommit state
+- Artifacts: `frontend/src/hooks/useDayCommit.ts`
+
+### PLN-007: Add More Tasks
+- `AddTaskButton` component with dialog
+- Two modes: quick capture (new task) and browse (existing)
+- Quick capture creates new action and adds to today
+- Browse mode with search filter
+- Artifacts: `frontend/src/components/planning/AddTaskButton.tsx`
+
+### PLN-008: Remove from Today
+- Already implemented in TodayView
+- X button on TodayActionCard removes action
+- Returns to inbox for later
+- Artifacts: Existing in `frontend/src/components/planning/TodayView.tsx`
+
 ---
 
 *Last session ended: December 15, 2025*
-*Next session should: Continue Phase 7 - Stage 3 Capture Completions (CAP-003, CAP-004, CAP-005, CAP-007, CAP-008)*
+*Next session should: Continue Phase 7 - Stage 5 Execution Completions (EXE-006, EXE-008, EXE-009, EXE-010)*
 
 **Session Notes:**
-- Stage 2 complete (4/4 features + EXE-004): EXE-002, EXE-004, EXE-005, EXE-001, EXE-012
+- Stage 3 complete (5/5 features): CAP-003, CAP-004, CAP-005, CAP-007, CAP-008
+- Stage 4 complete (5/5 features): PLN-003, PLN-004, PLN-005, PLN-007, PLN-008
+- Stage 5 in progress: EXE-007 (Stuck Button) done
 - TypeScript passes
-- Ready to start CAP-003 (Chat Voice Input) - depends on INT-003, INT-006 (both done)
+- Ready to continue Stage 5 (EXE-008 Stuck Options, EXE-006 First Step Suggestions, etc.)
