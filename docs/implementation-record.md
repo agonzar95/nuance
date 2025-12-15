@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 7 - Workflow Features (IN PROGRESS)
-- **Total Features:** 74 completed of 107 total
-- **Last Updated:** December 12, 2025
-- **Last Commit:** `2f47cfc` [PHASE-06] COMPLETE - Frontend Layer
+- **Total Features:** 79 completed of 107 total
+- **Last Updated:** December 15, 2025
+- **Last Commit:** `425216d` [PHASE-07] Stage 1 - Workflow Foundation Components
 
 ---
 
@@ -12,7 +12,7 @@
 
 **Goal:** Build the complete user workflows: Capture, Planning, Execution, Reflection.
 
-### Phase 7 Features (6/26 Complete)
+### Phase 7 Features (11/26 Complete)
 
 #### Stage 1 - Foundation Components (6/6 Complete)
 
@@ -25,14 +25,14 @@
 | REF-005 | Roll/Drop Controls | DONE | Easy | FE-007 |
 | REF-006 | Tomorrow Quick Capture | DONE | Easy | CAP-002 |
 
-#### Stage 2 - Execution Core (0/4 Pending)
+#### Stage 2 - Execution Core (4/4 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
-| EXE-002 | Focus Task Card | TODO | Easy | FE-007, EXE-003 |
-| EXE-001 | Focus Mode Container | TODO | Easy | EXE-002, EXE-004 |
-| EXE-005 | Breakdown Prompt | TODO | Easy | EXE-003 |
-| EXE-012 | Rest Screen | TODO | Easy | EXE-001 |
+| EXE-002 | Focus Task Card | DONE | Easy | FE-007, EXE-003 |
+| EXE-001 | Focus Mode Container | DONE | Easy | EXE-002, EXE-004 |
+| EXE-005 | Breakdown Prompt | DONE | Easy | EXE-003 |
+| EXE-012 | Rest Screen | DONE | Easy | EXE-001 |
 
 #### Stage 3 - Capture Completions (0/5 Pending)
 
@@ -54,11 +54,11 @@
 | PLN-007 | Add More Tasks | TODO | Easy | CAP-002, FE-005 |
 | PLN-008 | Remove from Today | TODO | Easy | PLN-002, FE-002 |
 
-#### Stage 5 - Execution Completions (0/6 Pending)
+#### Stage 5 - Execution Completions (1/6 Pending)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
-| EXE-004 | Focus Timer | TODO | Easy | FE-008 |
+| EXE-004 | Focus Timer | DONE | Easy | FE-008 |
 | EXE-006 | First Step Suggestions | TODO | Medium | AGT-012 |
 | EXE-009 | Coaching Overlay | TODO | Medium | AGT-014, CAP-001 |
 | EXE-008 | Stuck Options | TODO | Easy | EXE-005, EXE-009 |
@@ -75,6 +75,10 @@
 | Win highlights | High-avoidance completions celebrated | READY |
 | Roll/drop works | Remaining tasks roll or drop | READY |
 | Tomorrow capture | Quick capture for tomorrow | READY |
+| Focus task card | Task displays with title, avoidance, subtasks | READY |
+| Focus mode container | Full-screen with timer and exit confirm | READY |
+| Breakdown prompt | Prompts for first step on complex tasks | READY |
+| Rest screen | Calming break screen with countdown | READY |
 | TypeScript passes | `npm run typecheck` exits with 0 | PASS |
 
 ---
@@ -597,13 +601,51 @@
 - Keyboard support (Escape to skip)
 - Artifacts: `frontend/src/components/reflection/TomorrowQuickCapture.tsx`
 
+### EXE-002: Focus Task Card
+- `FocusTaskCard` component displays current task prominently
+- Large centered title with avoidance indicator
+- Shows subtasks via `SubtaskChecklist` integration
+- Displays estimated time
+- Artifacts: `frontend/src/components/execution/FocusTaskCard.tsx`
+
+### EXE-004: Focus Timer
+- `FocusTimer` component displays elapsed time subtly
+- Format: MM:SS or H:MM:SS for longer sessions
+- `useFocusTimer` hook for timer state management
+- Supports pause, resume, reset controls
+- Resets when action changes
+- Artifacts: `frontend/src/components/execution/FocusTimer.tsx`
+
+### EXE-005: Breakdown Prompt
+- `BreakdownPrompt` component for complex task decomposition
+- Asks "What's the smallest first step you can take?"
+- Text input for user-defined step
+- Skip option for clear tasks
+- Loading state during save
+- Artifacts: `frontend/src/components/execution/BreakdownPrompt.tsx`
+
+### EXE-001: Focus Mode Container
+- `FocusModeContainer` provides full-screen focus experience
+- Adds `focus-mode` class to body for navbar hiding
+- Shows elapsed time via `FocusTimer`
+- Action bar with "I'm stuck" and "Done" buttons
+- `ExitConfirmDialog` with Escape key trigger
+- Artifacts: `frontend/src/components/execution/FocusModeContainer.tsx`
+
+### EXE-012: Rest Screen
+- `RestScreen` for calming breaks between focus blocks
+- Gradient background with coffee icon
+- Countdown timer from suggested minutes (default 5)
+- "I'm ready to continue" and "Skip break" options
+- Non-pressuring, guilt-free messaging
+- Artifacts: `frontend/src/components/execution/RestScreen.tsx`
+
 ---
 
-*Last session ended: December 12, 2025*
-*Next session should: Continue Phase 7 - Stage 2 Execution Core (EXE-002, EXE-004, EXE-005, EXE-001, EXE-012)*
+*Last session ended: December 15, 2025*
+*Next session should: Continue Phase 7 - Stage 3 Capture Completions (CAP-003, CAP-004, CAP-005, CAP-007, CAP-008)*
 
 **Session Notes:**
-- Stage 1 complete (6/6 features): CAP-001, PLN-001, PLN-002, REF-003, REF-005, REF-006
-- Installed dependencies: `date-fns`, `@hello-pangea/dnd`
+- Stage 2 complete (4/4 features + EXE-004): EXE-002, EXE-004, EXE-005, EXE-001, EXE-012
 - TypeScript passes
-- Ready to start EXE-002 (Focus Task Card) and EXE-004 (Focus Timer) in parallel
+- Ready to start CAP-003 (Chat Voice Input) - depends on INT-003, INT-006 (both done)
