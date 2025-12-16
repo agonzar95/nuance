@@ -93,13 +93,21 @@ export default function DashboardPage() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-gray-900">Nuance</h1>
-          <button
-            onClick={handleSignOut}
-            disabled={isSigningOut}
-            className="text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
-          >
-            {isSigningOut ? 'Signing out...' : 'Sign out'}
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/dashboard/settings"
+              className="text-sm text-gray-600 hover:text-gray-900"
+            >
+              Settings
+            </Link>
+            <button
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className="text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
+            >
+              {isSigningOut ? 'Signing out...' : 'Sign out'}
+            </button>
+          </div>
         </div>
       </header>
 

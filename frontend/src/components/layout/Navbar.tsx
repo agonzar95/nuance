@@ -15,6 +15,7 @@ import {
   Target,
   BarChart3,
   Plus,
+  Settings,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -72,6 +73,21 @@ export function Navbar() {
 
       {/* Spacer */}
       <div className="flex-1" />
+
+      {/* Settings Link */}
+      <Link
+        href="/dashboard/settings"
+        className={cn(
+          'flex flex-col items-center justify-center w-16 h-16 rounded-lg',
+          'hover:bg-muted transition-colors',
+          'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          pathname === '/dashboard/settings' && 'bg-muted text-primary'
+        )}
+        aria-current={pathname === '/dashboard/settings' ? 'page' : undefined}
+      >
+        <Settings className="w-6 h-6" aria-hidden="true" />
+        <span className="text-xs mt-1">Settings</span>
+      </Link>
 
       {/* Quick Add Button */}
       <QuickAddButton />

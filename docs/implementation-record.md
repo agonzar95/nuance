@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
-- **Total Features:** 102 completed of 107 total
+- **Total Features:** 104 completed of 107 total
 - **Last Updated:** December 16, 2025
-- **Last Commit:** Pending - [PHASE-08] Page Orchestrators + Notifications
+- **Last Commit:** Pending - [PHASE-08] Onboarding + Settings
 
 ---
 
@@ -763,7 +763,7 @@
 
 **Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
 
-### Phase 8 Features (8/13 Complete)
+### Phase 8 Features (10/13 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
@@ -775,8 +775,8 @@
 | NTF-008 | EOD Summary Email | DONE | Medium | NTF-002, AGT-015 |
 | JOB-001 | Morning Check Job | DONE | Medium | SUB-009, NTF-007 |
 | JOB-002 | EOD Check Job | DONE | Medium | SUB-009, NTF-008 |
-| INF-009 | Onboarding Flow | NOT STARTED | Medium | SUB-003, SUB-005 |
-| INF-010 | Settings Page | NOT STARTED | Easy | SUB-005, SUB-007 |
+| INF-009 | Onboarding Flow | DONE | Medium | SUB-003, SUB-005 |
+| INF-010 | Settings Page | DONE | Easy | SUB-005, SUB-007 |
 | PWA-003 | Offline Support | NOT STARTED | Medium | FE-011, PWA-001 |
 | JOB-003 | Idle Nudge Job | NOT STARTED | Medium | SUB-009, NTF-002 |
 | TG-001 | Telegram Integration | NOT STARTED | Hard | NTF-003, INT-004 |
@@ -849,12 +849,40 @@
 - Only sends to users with `notification_enabled = true`
 - Artifacts: `backend/jobs/eod_check.py`
 
+#### INF-009: Onboarding Flow
+- `OnboardingWizard` component with 4-step wizard: Welcome, Timezone, Telegram, Tutorial
+- Welcome step introduces Nuance's value proposition
+- Timezone step with auto-detection and common timezone list
+- Telegram step with connection instructions (optional skip)
+- Tutorial step with animated slides showing Capture → Plan → Execute → Reflect workflow
+- Dashboard layout checks `profile.onboarding_completed` and redirects to `/onboarding` if false
+- On completion: updates profile with timezone and `onboarding_completed = true`
+- Artifacts: `frontend/src/components/onboarding/OnboardingWizard.tsx`, `frontend/src/app/(app)/onboarding/page.tsx`, `frontend/src/app/(app)/dashboard/layout.tsx`
+
+#### INF-010: Settings Page
+- Full settings page at `/dashboard/settings`
+- Account section showing user email
+- Timezone section with auto-detection, common timezones, and "show all" option
+- Telegram connection section with connection status and linking instructions
+- Notification preferences using existing `NotificationSettings` component (SUB-007)
+- Danger zone with delete account placeholder
+- Settings link added to Navbar and dashboard header
+- Artifacts: `frontend/src/app/(app)/dashboard/settings/page.tsx`
+
 ---
 
 *Last session ended: December 16, 2025*
-*Next session should: Continue Phase 8 - INF-009, INF-010, JOB-003, PWA-003, TG-001 (5 features remaining)*
+*Next session should: Continue Phase 8 - PWA-003, JOB-003, TG-001 (3 features remaining)*
 
 **Session Notes (December 16, 2025):**
+- Phase 8 progress: 10/13 features complete
+- Implemented INF-009 (Onboarding Flow) and INF-010 (Settings Page)
+- OnboardingWizard: 4-step wizard with Welcome, Timezone, Telegram, Tutorial
+- Settings page includes timezone, Telegram connection, notification preferences
+- Dashboard layout now checks onboarding status and redirects if not completed
+- Added Settings link to Navbar and dashboard header
+
+**Previous Session Notes (December 16, 2025):**
 - Phase 8 progress: 8/13 features complete
 - Implemented JOB-001 (Morning Check Job) and JOB-002 (EOD Check Job)
 - Jobs follow existing pattern from `state_transitions.py`
