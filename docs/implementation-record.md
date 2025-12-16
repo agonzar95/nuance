@@ -1,10 +1,10 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 7 - Workflow Features (COMPLETE)
-- **Total Features:** 94 completed of 107 total
-- **Last Updated:** December 15, 2025
-- **Last Commit:** `99f07d0` [PHASE-07] Stage 3 + Stage 4 - Capture & Planning Completions
+- **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
+- **Total Features:** 98 completed of 107 total
+- **Last Updated:** December 16, 2025
+- **Last Commit:** Pending - [PHASE-08] Page Orchestrators (CAP-009, PLN-009, EXE-013, REF)
 
 ---
 
@@ -759,16 +759,76 @@
 
 ---
 
+## Current Phase: Phase 8 - Page Orchestrators, Jobs & Polish
+
+**Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
+
+### Phase 8 Features (4/13 Complete)
+
+| ID | Feature | Status | Complexity | Dependencies |
+|----|---------|--------|------------|--------------|
+| CAP-009 | Capture Page Container | DONE | Medium | CAP-001..008, FE-001, AGT-016 |
+| PLN-009 | Planning Page Container | DONE | Medium | PLN-001..008, FE-001 |
+| EXE-013 | Focus Mode Page | DONE | Medium | EXE-001..012, FE-001, AGT-014 |
+| REF-009 | Reflection Page | DONE | Medium | REF-003, REF-005, REF-006 |
+| NTF-007 | Morning Plan Email | NOT STARTED | Medium | NTF-002, AGT-015 |
+| NTF-008 | EOD Summary Email | NOT STARTED | Medium | NTF-002, AGT-015 |
+| INF-009 | Onboarding Flow | NOT STARTED | Medium | SUB-003, SUB-005 |
+| INF-010 | Settings Page | NOT STARTED | Easy | SUB-005, SUB-007 |
+| PWA-003 | Offline Support | NOT STARTED | Medium | FE-011, PWA-001 |
+| JOB-001 | Morning Check Job | NOT STARTED | Medium | SUB-009, NTF-007 |
+| JOB-002 | EOD Check Job | NOT STARTED | Medium | SUB-009, NTF-008 |
+| JOB-003 | Idle Nudge Job | NOT STARTED | Medium | SUB-009, NTF-002 |
+| TG-001 | Telegram Integration | NOT STARTED | Hard | NTF-003, INT-004 |
+
+### Phase 8 Artifacts
+
+#### CAP-009: Capture Page Container
+- Full chat-based capture experience
+- Message list with streaming support
+- Ghost card during AI extraction
+- Confidence validation for low-confidence extractions
+- Auto-save high-confidence actions to inbox
+- Artifacts: `frontend/src/app/(app)/dashboard/capture/page.tsx`
+
+#### PLN-009: Planning Page Container
+- Drag-drop planning with PlanningLayout component
+- Inbox suggestions with AI reasoning
+- Today's list with time budget
+- Reorder tasks, add/remove from today
+- Start day navigates to execute
+- Artifacts: `frontend/src/app/(app)/dashboard/plan/page.tsx`
+
+#### EXE-013: Focus Mode Page
+- 8-phase state machine: loading → breakdown → working → stuck-options → coaching → completing → avoidance-ack → rest
+- FocusModeContainer with timer
+- BreakdownPrompt for complex tasks
+- StuckOptions and CoachingOverlay for blockers
+- AvoidanceAcknowledgment for high-avoidance wins
+- RestScreen before next task
+- Artifacts: `frontend/src/app/(app)/dashboard/execute/page.tsx`
+
+#### REF: Reflection Page
+- Multi-phase end-of-day review: wins → remaining → capture → done
+- WinHighlights celebrates high-avoidance completions
+- RemainingTaskCard with roll/drop controls
+- TomorrowQuickCapture for next-day thoughts
+- Artifacts: `frontend/src/app/(app)/dashboard/reflect/page.tsx`
+
+---
+
 *Last session ended: December 16, 2025*
-*Next session should: Begin Phase 8 - Polish (13 features)*
+*Next session should: Continue Phase 8 - NTF-007, NTF-008, INF-009 (9 features remaining)*
 
-**Session Notes:**
-- Phase 7 COMPLETE (26/26 features)
-- Stage 5 complete (6/6 features): EXE-004, EXE-007, EXE-006, EXE-008, EXE-009, EXE-010
+**Session Notes (December 16, 2025):**
+- Phase 8 started: 4/13 features complete
+- Implemented all 4 page orchestrators (CAP-009, PLN-009, EXE-013, REF)
+- Added dashboard with real-time stats from API
+- Fixed home page with login/signup navigation
 - TypeScript passes
-- Ready to begin Phase 8
+- Ready to continue with notification and job features
 
-**Hotfix Applied (2025-12-16):**
+**Previous Session - Hotfix Applied (2025-12-16):**
 - Fixed INF-001 spec gap: Added missing Tailwind CSS configuration files
 - Commit: `1f864b7` [INF-001-FIX] Add missing Tailwind CSS configuration files
 - See: `docs/implementation-gaps-analysis.md` for root cause analysis and prevention checklist
