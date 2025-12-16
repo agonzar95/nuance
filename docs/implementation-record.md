@@ -2,7 +2,7 @@
 
 ## Project Status
 - **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
-- **Total Features:** 100 completed of 107 total
+- **Total Features:** 102 completed of 107 total
 - **Last Updated:** December 16, 2025
 - **Last Commit:** Pending - [PHASE-08] Page Orchestrators + Notifications
 
@@ -763,7 +763,7 @@
 
 **Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
 
-### Phase 8 Features (6/13 Complete)
+### Phase 8 Features (8/13 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
@@ -773,11 +773,11 @@
 | REF-009 | Reflection Page | DONE | Medium | REF-003, REF-005, REF-006 |
 | NTF-007 | Morning Plan Email | DONE | Medium | NTF-002, AGT-015 |
 | NTF-008 | EOD Summary Email | DONE | Medium | NTF-002, AGT-015 |
+| JOB-001 | Morning Check Job | DONE | Medium | SUB-009, NTF-007 |
+| JOB-002 | EOD Check Job | DONE | Medium | SUB-009, NTF-008 |
 | INF-009 | Onboarding Flow | NOT STARTED | Medium | SUB-003, SUB-005 |
 | INF-010 | Settings Page | NOT STARTED | Easy | SUB-005, SUB-007 |
 | PWA-003 | Offline Support | NOT STARTED | Medium | FE-011, PWA-001 |
-| JOB-001 | Morning Check Job | NOT STARTED | Medium | SUB-009, NTF-007 |
-| JOB-002 | EOD Check Job | NOT STARTED | Medium | SUB-009, NTF-008 |
 | JOB-003 | Idle Nudge Job | NOT STARTED | Medium | SUB-009, NTF-002 |
 | TG-001 | Telegram Integration | NOT STARTED | Hard | NTF-003, INT-004 |
 
@@ -832,17 +832,40 @@
 - Supportive tone for remaining tasks ("That's okay - tomorrow is a new day")
 - Artifacts: `backend/app/services/notifications/content/eod.py`
 
+#### JOB-001: Morning Check Job
+- Scheduled job runs hourly, triggers at 8am user local time
+- Uses `is_users_local_hour()` from timezone utils to find eligible users
+- Fetches today's planned tasks for each user
+- Sends notification via `NotificationGateway` using `MorningPlanContent` formatter
+- Only sends to users with `notification_enabled = true`
+- Artifacts: `backend/jobs/morning_check.py`
+
+#### JOB-002: EOD Check Job
+- Scheduled job runs hourly, triggers at 9pm user local time
+- Fetches completed tasks updated today, remaining planned tasks
+- Identifies high-avoidance wins (avoidance_weight >= 4)
+- Sends notification via `NotificationGateway` using `EODSummaryContent` formatter
+- Skips users with no activity (nothing completed, nothing planned)
+- Only sends to users with `notification_enabled = true`
+- Artifacts: `backend/jobs/eod_check.py`
+
 ---
 
 *Last session ended: December 16, 2025*
-*Next session should: Continue Phase 8 - INF-009, INF-010, jobs (7 features remaining)*
+*Next session should: Continue Phase 8 - INF-009, INF-010, JOB-003, PWA-003, TG-001 (5 features remaining)*
 
 **Session Notes (December 16, 2025):**
+- Phase 8 progress: 8/13 features complete
+- Implemented JOB-001 (Morning Check Job) and JOB-002 (EOD Check Job)
+- Jobs follow existing pattern from `state_transitions.py`
+- Use `NotificationGateway` to route to user's preferred channel
+- Use content formatters (NTF-007, NTF-008) for consistent formatting
+
+**Previous Session (December 16, 2025):**
 - Phase 8 progress: 6/13 features complete
 - Implemented NTF-007 (Morning Plan Content) and NTF-008 (EOD Summary Content)
 - Created notification content directory with formatters for email and Telegram
 - Both formatters support structured data classes for type safety
-- Ready to continue with JOB-001, JOB-002 (jobs that use these notifications)
 
 **Previous Session (December 16, 2025):**
 - Phase 8 started: 4/13 features complete
