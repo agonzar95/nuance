@@ -399,6 +399,12 @@
 - Path aliases configured: `@/*` → `./src/*`
 - Artifacts: `frontend/` directory with full Next.js setup
 
+**[FIX - 2025-12-16]** Missing configuration files caused unstyled UI:
+- Created `frontend/postcss.config.js` with `@tailwindcss/postcss` plugin
+- Created `frontend/tailwind.config.ts` with content paths
+- Installed `@tailwindcss/postcss` package (required for Tailwind v4)
+- Root cause documented in `docs/implementation-gaps-analysis.md`
+
 ### INF-002: FastAPI Setup
 - Used FastAPI 0.124 with Pydantic Settings for configuration
 - Modular structure: routers/, services/, models/ directories
@@ -753,7 +759,7 @@
 
 ---
 
-*Last session ended: December 15, 2025*
+*Last session ended: December 16, 2025*
 *Next session should: Begin Phase 8 - Polish (13 features)*
 
 **Session Notes:**
@@ -761,3 +767,13 @@
 - Stage 5 complete (6/6 features): EXE-004, EXE-007, EXE-006, EXE-008, EXE-009, EXE-010
 - TypeScript passes
 - Ready to begin Phase 8
+
+**Hotfix Applied (2025-12-16):**
+- Fixed INF-001 spec gap: Added missing Tailwind CSS configuration files
+- Commit: `1f864b7` [INF-001-FIX] Add missing Tailwind CSS configuration files
+- See: `docs/implementation-gaps-analysis.md` for root cause analysis and prevention checklist
+
+**Known Issues:**
+- PWA icons missing: `manifest.json` references 12 PNG icons that don't exist in `frontend/public/icons/`
+- Only `icon.svg` exists; PNG variants need to be generated
+- Non-blocking for development but needed before production deployment
