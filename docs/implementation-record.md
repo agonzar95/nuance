@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
-- **Total Features:** 98 completed of 107 total
+- **Total Features:** 100 completed of 107 total
 - **Last Updated:** December 16, 2025
-- **Last Commit:** Pending - [PHASE-08] Page Orchestrators (CAP-009, PLN-009, EXE-013, REF)
+- **Last Commit:** Pending - [PHASE-08] Page Orchestrators + Notifications
 
 ---
 
@@ -763,7 +763,7 @@
 
 **Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
 
-### Phase 8 Features (4/13 Complete)
+### Phase 8 Features (6/13 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
@@ -771,8 +771,8 @@
 | PLN-009 | Planning Page Container | DONE | Medium | PLN-001..008, FE-001 |
 | EXE-013 | Focus Mode Page | DONE | Medium | EXE-001..012, FE-001, AGT-014 |
 | REF-009 | Reflection Page | DONE | Medium | REF-003, REF-005, REF-006 |
-| NTF-007 | Morning Plan Email | NOT STARTED | Medium | NTF-002, AGT-015 |
-| NTF-008 | EOD Summary Email | NOT STARTED | Medium | NTF-002, AGT-015 |
+| NTF-007 | Morning Plan Email | DONE | Medium | NTF-002, AGT-015 |
+| NTF-008 | EOD Summary Email | DONE | Medium | NTF-002, AGT-015 |
 | INF-009 | Onboarding Flow | NOT STARTED | Medium | SUB-003, SUB-005 |
 | INF-010 | Settings Page | NOT STARTED | Easy | SUB-005, SUB-007 |
 | PWA-003 | Offline Support | NOT STARTED | Medium | FE-011, PWA-001 |
@@ -815,18 +815,41 @@
 - TomorrowQuickCapture for next-day thoughts
 - Artifacts: `frontend/src/app/(app)/dashboard/reflect/page.tsx`
 
+#### NTF-007: Morning Plan Content
+- `MorningPlanContent` class for formatting morning plan notifications
+- `MorningPlanData` and `PlanTask` dataclasses for structured data
+- Supports email (HTML) and Telegram (Markdown) formats
+- Shows tasks with avoidance indicators and time estimates
+- Includes total planned time summary
+- Artifacts: `backend/app/services/notifications/content/morning.py`
+
+#### NTF-008: EOD Summary Content
+- `EODSummaryContent` class for formatting end-of-day summary notifications
+- `EODSummaryData` and `CompletedTask` dataclasses for structured data
+- Supports email (HTML) and Telegram (Markdown) formats
+- Highlights high-avoidance wins with special section
+- Shows completed tasks, AI summary, and remaining count
+- Supportive tone for remaining tasks ("That's okay - tomorrow is a new day")
+- Artifacts: `backend/app/services/notifications/content/eod.py`
+
 ---
 
 *Last session ended: December 16, 2025*
-*Next session should: Continue Phase 8 - NTF-007, NTF-008, INF-009 (9 features remaining)*
+*Next session should: Continue Phase 8 - INF-009, INF-010, jobs (7 features remaining)*
 
 **Session Notes (December 16, 2025):**
+- Phase 8 progress: 6/13 features complete
+- Implemented NTF-007 (Morning Plan Content) and NTF-008 (EOD Summary Content)
+- Created notification content directory with formatters for email and Telegram
+- Both formatters support structured data classes for type safety
+- Ready to continue with JOB-001, JOB-002 (jobs that use these notifications)
+
+**Previous Session (December 16, 2025):**
 - Phase 8 started: 4/13 features complete
 - Implemented all 4 page orchestrators (CAP-009, PLN-009, EXE-013, REF)
 - Added dashboard with real-time stats from API
 - Fixed home page with login/signup navigation
 - TypeScript passes
-- Ready to continue with notification and job features
 
 **Previous Session - Hotfix Applied (2025-12-16):**
 - Fixed INF-001 spec gap: Added missing Tailwind CSS configuration files
