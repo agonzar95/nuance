@@ -962,7 +962,18 @@
 ---
 
 *Last session ended: December 17, 2025*
-*Next session should: Commit TG-001 completion, verify end-to-end flow, mark Phase 8 complete (107/107 features)*
+*Next session should: Set up Telegram webhook (requires tunnel for local dev or deploy to production), then test full Telegram messaging flow*
+
+**Session Notes (December 17, 2025 - E2E Testing):**
+- Ran manual E2E test for TG-001 Telegram Integration
+- Started frontend (port 3000) and backend (port 8000) servers
+- Verified TG-0012 Token Service: create, validate, consume all pass
+- Verified TG-0014 API Endpoints: auth required, connect/disconnect work
+- Verified TG-0015 Connection Page: user confirmed flow works in browser
+- Verified TG-0016 Disconnect: shows "How to connect" after disconnect (correct UX)
+- TypeScript passes
+- Note: Telegram messaging not tested - requires webhook setup (ngrok/cloudflared or production deploy)
+- TG-001 account linking is COMPLETE and verified
 
 **Session Notes (December 17, 2025 - TG-0015, TG-0016):**
 - Implemented TG-0015 (Connection Page Frontend)
