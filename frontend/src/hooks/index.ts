@@ -57,5 +57,10 @@ export {
 // Profile hooks
 export { useProfile } from './useProfile'
 
-// Offline hook
+// Offline hooks (FE-011, PWA-003)
 export { useOffline } from './useOffline'
+export {
+  useOfflineQueue,
+  useOfflineMutation,
+  type QueuedMutation,
+} from './useOfflineQueue'

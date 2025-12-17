@@ -179,4 +179,54 @@ self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') {
     self.skipWaiting()
   }
+
+  // Handle manual sync request from app
+  if (event.data === 'syncOfflineQueue') {
+    processOfflineQueue()
+  }
+})
+
+// ============================================================================
+// Background Sync Event (PWA-003)
+// ============================================================================
+
+const SYNC_TAG = 'nuance-offline-sync'
+const OFFLINE_QUEUE_KEY = 'nuance-offline-queue'
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === SYNC_TAG) {
+    event.waitUntil(processOfflineQueue())
+  }
+})
+
+/**
+ * Process queued offline mutations
+ * Reads from localStorage and attempts to sync each item
+ */
+async function processOfflineQueue() {
+  try {
+    // Read queue from a cache or IndexedDB
+    // Note: We use a broadcast channel to communicate with the main app
+    // since service workers can't directly access localStorage
+    const clients = await self.clients.matchAll({ type: 'window' })
+
+    if (clients.length > 0) {
+      // Notify the app to process its queue
+      clients.forEach((client) => {
+        client.postMessage({ type: 'PROCESS_OFFLINE_QUEUE' })
+      })
+    }
+  } catch (e) {
+    console.error('Failed to process offline queue:', e)
+  }
+}
+
+// ============================================================================
+// Periodic Sync (if available) for regular sync attempts
+// ============================================================================
+
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'nuance-periodic-sync') {
+    event.waitUntil(processOfflineQueue())
+  }
 })

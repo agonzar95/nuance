@@ -2,9 +2,9 @@
 
 ## Project Status
 - **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
-- **Total Features:** 104 completed of 107 total
-- **Last Updated:** December 16, 2025
-- **Last Commit:** Pending - [PHASE-08] Onboarding + Settings
+- **Total Features:** 106 completed of 107 total
+- **Last Updated:** December 17, 2025
+- **Last Commit:** Pending - [PWA-003, JOB-003] Offline support + Idle nudge job
 
 ---
 
@@ -763,7 +763,7 @@
 
 **Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
 
-### Phase 8 Features (10/13 Complete)
+### Phase 8 Features (12/13 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
@@ -777,8 +777,8 @@
 | JOB-002 | EOD Check Job | DONE | Medium | SUB-009, NTF-008 |
 | INF-009 | Onboarding Flow | DONE | Medium | SUB-003, SUB-005 |
 | INF-010 | Settings Page | DONE | Easy | SUB-005, SUB-007 |
-| PWA-003 | Offline Support | NOT STARTED | Medium | FE-011, PWA-001 |
-| JOB-003 | Idle Nudge Job | NOT STARTED | Medium | SUB-009, NTF-002 |
+| PWA-003 | Offline Support | DONE | Medium | FE-011, FE-013 |
+| JOB-003 | Idle Nudge Job | DONE | Medium | SUB-009, NTF-002 |
 | TG-001 | Telegram Integration | NOT STARTED | Hard | NTF-003, INT-004 |
 
 ### Phase 8 Artifacts
@@ -869,12 +869,40 @@
 - Settings link added to Navbar and dashboard header
 - Artifacts: `frontend/src/app/(app)/dashboard/settings/page.tsx`
 
+#### PWA-003: Offline Support
+- `useOfflineQueue` hook for queueing mutations when offline
+- `useOfflineMutation` hook for auto-queueing mutations with offline detection
+- Background sync registration via `requestSync()` utility
+- Service worker updated with sync event handler
+- `OfflineQueueProvider` context for app-wide offline queue access
+- Enhanced `OfflineBanner` shows queue count and syncing status
+- Persists queue to localStorage across sessions
+- Auto-processes queue when coming back online
+- Artifacts: `frontend/src/hooks/useOfflineQueue.ts`, `frontend/src/lib/backgroundSync.ts`, `frontend/src/components/providers/OfflineQueueProvider.tsx`, `frontend/public/sw.js`
+
+#### JOB-003: Idle Nudge Job
+- Scheduled job runs daily at noon UTC
+- SQL function `get_inactive_users(since)` finds users with no activity in 3+ days
+- Activity includes: actions created/updated, user messages sent
+- Sends gentle, non-shaming check-in message via notification gateway
+- Uses existing `INACTIVITY_CHECK` notification type
+- Fallback query if RPC function doesn't exist
+- Artifacts: `backend/jobs/idle_nudge.py`, `backend/supabase/migrations/004_inactive_users_function.sql`
+
 ---
 
-*Last session ended: December 16, 2025*
-*Next session should: Continue Phase 8 - PWA-003, JOB-003, TG-001 (3 features remaining)*
+*Last session ended: December 17, 2025*
+*Next session should: Complete Phase 8 - TG-001 (1 feature remaining)*
 
-**Session Notes (December 16, 2025):**
+**Session Notes (December 17, 2025):**
+- Phase 8 progress: 12/13 features complete
+- Implemented PWA-003 (Offline Support) and JOB-003 (Idle Nudge Job)
+- PWA-003: Offline mutation queue with background sync, enhanced OfflineBanner
+- JOB-003: Daily job to nudge inactive users (3+ days no activity)
+- Added SQL function get_inactive_users for efficient inactive user lookup
+- TypeScript passes
+
+**Previous Session Notes (December 16, 2025):**
 - Phase 8 progress: 10/13 features complete
 - Implemented INF-009 (Onboarding Flow) and INF-010 (Settings Page)
 - OnboardingWizard: 4-step wizard with Welcome, Timezone, Telegram, Tutorial
