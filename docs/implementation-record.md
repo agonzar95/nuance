@@ -779,7 +779,23 @@
 | INF-010 | Settings Page | DONE | Easy | SUB-005, SUB-007 |
 | PWA-003 | Offline Support | DONE | Medium | FE-011, FE-013 |
 | JOB-003 | Idle Nudge Job | DONE | Medium | SUB-009, NTF-002 |
-| TG-001 | Telegram Integration | NOT STARTED | Hard | NTF-003, INT-004 |
+| TG-001 | Telegram Integration | IN PROGRESS | Hard | NTF-003, INT-004 |
+
+### TG-001 Implementation Plan
+
+**Status:** Broken down into substeps, ready for implementation.
+**Breakdown:** See `planning/TG-001_Telegram_Integration_Breakdown.md`
+
+| Substep | Name | Status |
+|---------|------|--------|
+| TG-0011 | Database Migration | DONE |
+| TG-0012 | Token Storage Service | DONE |
+| TG-0013 | Update /start Command | NOT STARTED |
+| TG-0014 | Connection API Endpoint | NOT STARTED |
+| TG-0015 | Connection Page (Frontend) | NOT STARTED |
+| TG-0016 | Disconnect Functionality | NOT STARTED |
+
+**Next:** Start with TG-0013 (Update /start Command)
 
 ### Phase 8 Artifacts
 
@@ -889,12 +905,43 @@
 - Fallback query if RPC function doesn't exist
 - Artifacts: `backend/jobs/idle_nudge.py`, `backend/supabase/migrations/004_inactive_users_function.sql`
 
+#### TG-0011: Database Migration (Telegram Connections)
+- Created `pending_telegram_connections` table for temporary connection tokens
+- Columns: id (UUID PK), token (unique), telegram_chat_id, expires_at, created_at
+- Indexed on token (fast lookups) and expires_at (cleanup queries)
+- No RLS needed - accessed only via service role, tokens are temporary
+- Tokens expire after 15 minutes, consumed on successful account link
+- Artifacts: `backend/supabase/migrations/005_telegram_connections.sql`
+
+#### TG-0012: Token Storage Service
+- `TelegramConnectionService` class for managing connection tokens
+- `create_token(chat_id)`: Generates 43-char URL-safe token, stores with 15-min expiry
+- `validate_token(token)`: Returns chat_id if valid and not expired, else None
+- `consume_token(token)`: Validates, deletes token, returns chat_id (one-time use)
+- `cleanup_expired()`: Deletes expired tokens, returns count
+- Singleton factory function `get_telegram_connection_service()`
+- Artifacts: `backend/app/services/telegram_connection.py`
+
 ---
 
 *Last session ended: December 17, 2025*
-*Next session should: Complete Phase 8 - TG-001 (1 feature remaining)*
+*Next session should: Implement TG-0013 (Update /start Command) - third substep of TG-001*
 
-**Session Notes (December 17, 2025):**
+**Session Notes (December 17, 2025 - Implementation):**
+- Implemented TG-0011 (Database Migration) and TG-0012 (Token Storage Service)
+- TG-0011: Created `pending_telegram_connections` table with token, chat_id, expiry
+- TG-0012: Created `TelegramConnectionService` with create/validate/consume/cleanup methods
+- Both substeps verified working via test scripts and SQL queries
+- Progress: 2/6 substeps complete for TG-001
+
+**Session Notes (December 17, 2025 - Planning):**
+- Analyzed TG-001 (Telegram Integration) - the final feature
+- Created detailed breakdown into 6 substeps: TG-0011 through TG-0016
+- Breakdown document: `planning/TG-001_Telegram_Integration_Breakdown.md`
+- Each substep has clear success criteria and dependencies
+- Ready for implementation starting with TG-0011 (Database Migration)
+
+**Previous Session Notes (December 17, 2025):**
 - Phase 8 progress: 12/13 features complete
 - Implemented PWA-003 (Offline Support) and JOB-003 (Idle Nudge Job)
 - PWA-003: Offline mutation queue with background sync, enhanced OfflineBanner
