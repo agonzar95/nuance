@@ -1,10 +1,10 @@
 # Implementation Record
 
 ## Project Status
-- **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (IN PROGRESS)
-- **Total Features:** 106 completed of 107 total
+- **Current Phase:** 8 - Page Orchestrators, Jobs & Polish (COMPLETE)
+- **Total Features:** 107 completed of 107 total
 - **Last Updated:** December 17, 2025
-- **Last Commit:** Pending - [PWA-003, JOB-003] Offline support + Idle nudge job
+- **Last Commit:** `64f3e3d` [TG-0015, TG-0016] Add Telegram connection page and disconnect functionality
 
 ---
 
@@ -763,7 +763,7 @@
 
 **Goal:** Build page orchestrators, implement background jobs, onboarding, and remaining integrations.
 
-### Phase 8 Features (12/13 Complete)
+### Phase 8 Features (13/13 Complete)
 
 | ID | Feature | Status | Complexity | Dependencies |
 |----|---------|--------|------------|--------------|
@@ -779,7 +779,7 @@
 | INF-010 | Settings Page | DONE | Easy | SUB-005, SUB-007 |
 | PWA-003 | Offline Support | DONE | Medium | FE-011, FE-013 |
 | JOB-003 | Idle Nudge Job | DONE | Medium | SUB-009, NTF-002 |
-| TG-001 | Telegram Integration | IN PROGRESS | Hard | NTF-003, INT-004 |
+| TG-001 | Telegram Integration | DONE | Hard | NTF-003, INT-004 |
 
 ### TG-001 Implementation Plan
 
@@ -792,10 +792,10 @@
 | TG-0012 | Token Storage Service | DONE |
 | TG-0013 | Update /start Command | DONE |
 | TG-0014 | Connection API Endpoint | DONE |
-| TG-0015 | Connection Page (Frontend) | NOT STARTED |
-| TG-0016 | Disconnect Functionality | NOT STARTED |
+| TG-0015 | Connection Page (Frontend) | DONE |
+| TG-0016 | Disconnect Functionality | DONE |
 
-**Next:** Start with TG-0015 (Connection Page Frontend)
+**Status:** All substeps complete. TG-001 ready for final commit.
 
 ### Phase 8 Artifacts
 
@@ -941,10 +941,37 @@
 - Returns 400 for invalid/expired tokens, 401 for missing auth
 - Artifacts: Updated `backend/app/routers/telegram.py`
 
+#### TG-0015: Connection Page (Frontend)
+- Created page at `frontend/src/app/(app)/settings/telegram/page.tsx`
+- Handles URL: `/settings/telegram?token=<token>`
+- Flow: Extract token → show loading → call API → show success/error
+- Auto-redirects to settings after 2 seconds on success
+- Clear error messages for expired/invalid tokens with retry guidance
+- Requires authentication (redirects to login if not authenticated)
+- Added `connectTelegram()`, `disconnectTelegram()`, `getTelegramStatus()` to API client
+- Artifacts: `frontend/src/app/(app)/settings/telegram/page.tsx`, updated `frontend/src/lib/api.ts`
+
+#### TG-0016: Disconnect Functionality
+- Added "Disconnect Telegram" button to settings page (visible when connected)
+- Inline confirmation dialog before disconnecting
+- Calls `POST /telegram/disconnect` API endpoint
+- Refetches profile to update UI after disconnect
+- Error handling with rollback on failure
+- Artifacts: Updated `frontend/src/app/(app)/dashboard/settings/page.tsx`
+
 ---
 
 *Last session ended: December 17, 2025*
-*Next session should: Implement TG-0015 (Connection Page Frontend) - fifth substep of TG-001*
+*Next session should: Commit TG-001 completion, verify end-to-end flow, mark Phase 8 complete (107/107 features)*
+
+**Session Notes (December 17, 2025 - TG-0015, TG-0016):**
+- Implemented TG-0015 (Connection Page Frontend)
+- Created `/settings/telegram?token=xxx` page for handling connection links
+- Added `connectTelegram()`, `disconnectTelegram()`, `getTelegramStatus()` to API client
+- Implemented TG-0016 (Disconnect Functionality)
+- Added disconnect button with confirmation dialog to settings page
+- TypeScript passes
+- Progress: 6/6 substeps complete for TG-001 - FEATURE COMPLETE
 
 **Session Notes (December 17, 2025 - TG-0014):**
 - Implemented TG-0014 (Connection API Endpoint)

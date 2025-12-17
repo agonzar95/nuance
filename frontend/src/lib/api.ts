@@ -297,6 +297,33 @@ class ApiClient {
   }
 
   // ==========================================================================
+  // Telegram
+  // ==========================================================================
+
+  /**
+   * Connect Telegram account using a connection token
+   */
+  async connectTelegram(token: string): Promise<{ success: boolean; message: string }> {
+    return this.request<{ success: boolean; message: string }>('POST', '/telegram/connect', {
+      body: { token },
+    })
+  }
+
+  /**
+   * Disconnect Telegram account
+   */
+  async disconnectTelegram(): Promise<{ success: boolean; message: string }> {
+    return this.request<{ success: boolean; message: string }>('POST', '/telegram/disconnect')
+  }
+
+  /**
+   * Get Telegram connection status
+   */
+  async getTelegramStatus(): Promise<{ connected: boolean; chat_id: string | null }> {
+    return this.request<{ connected: boolean; chat_id: string | null }>('GET', '/telegram/status')
+  }
+
+  // ==========================================================================
   // Transcription
   // ==========================================================================
 
@@ -404,6 +431,15 @@ export const api = {
     const client = getApiClient()
     return {
       transcribe: client.transcribe.bind(client),
+    }
+  },
+
+  get telegram() {
+    const client = getApiClient()
+    return {
+      connect: client.connectTelegram.bind(client),
+      disconnect: client.disconnectTelegram.bind(client),
+      status: client.getTelegramStatus.bind(client),
     }
   },
 }

@@ -15,13 +15,35 @@ import { useProfile, COMMON_TIMEZONES, detectTimezone } from '@/hooks/useProfile
 import { useSession } from '@/hooks/useSession'
 import { NotificationSettings } from '@/components/settings/NotificationSettings'
 import { Spinner } from '@/components/ui/Loading'
+import { api } from '@/lib/api'
 
 export default function SettingsPage() {
   const { user } = useSession()
-  const { profile, isLoading, error, updateProfile } = useProfile()
+  const { profile, isLoading, error, updateProfile, refetch } = useProfile()
   const [timezoneUpdating, setTimezoneUpdating] = useState(false)
   const [timezoneError, setTimezoneError] = useState<string | null>(null)
   const [showAllTimezones, setShowAllTimezones] = useState(false)
+
+  // Telegram disconnect state
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false)
+  const [disconnecting, setDisconnecting] = useState(false)
+  const [disconnectError, setDisconnectError] = useState<string | null>(null)
+
+  async function handleDisconnectTelegram() {
+    setDisconnecting(true)
+    setDisconnectError(null)
+
+    try {
+      await api.telegram.disconnect()
+      // Refetch profile to update UI
+      await refetch()
+      setShowDisconnectConfirm(false)
+    } catch (err) {
+      setDisconnectError(err instanceof Error ? err.message : 'Failed to disconnect Telegram')
+    } finally {
+      setDisconnecting(false)
+    }
+  }
 
   // All IANA timezones for full selection
   const allTimezones = typeof Intl !== 'undefined' && Intl.supportedValuesOf
@@ -183,29 +205,73 @@ export default function SettingsPage() {
             Connect Telegram to capture tasks and receive notifications on the go.
           </p>
 
+          {disconnectError && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+              {disconnectError}
+            </div>
+          )}
+
           {profile.telegram_chat_id ? (
-            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-green-900">Connected</p>
+                  <p className="text-sm text-green-700">
+                    You can send messages to the Nuance bot to capture tasks.
+                  </p>
+                </div>
+              </div>
+
+              {/* Disconnect Confirmation Dialog */}
+              {showDisconnectConfirm ? (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="font-medium text-amber-900 mb-2">
+                    Disconnect Telegram?
+                  </p>
+                  <p className="text-sm text-amber-800 mb-4">
+                    You won&apos;t be able to capture tasks or receive notifications via Telegram until you reconnect.
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleDisconnectTelegram}
+                      disabled={disconnecting}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      {disconnecting && <Spinner size="sm" />}
+                      {disconnecting ? 'Disconnecting...' : 'Yes, Disconnect'}
+                    </button>
+                    <button
+                      onClick={() => setShowDisconnectConfirm(false)}
+                      disabled={disconnecting}
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowDisconnectConfirm(true)}
+                  className="text-sm text-red-600 hover:text-red-800 font-medium"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="font-medium text-green-900">Connected</p>
-                <p className="text-sm text-green-700">
-                  You can send messages to the Nuance bot to capture tasks.
-                </p>
-              </div>
+                  Disconnect Telegram
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
