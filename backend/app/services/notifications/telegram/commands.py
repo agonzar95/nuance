@@ -5,7 +5,6 @@ Handles bot commands like /start, /help, /today, /status.
 
 from __future__ import annotations
 
-import secrets
 from datetime import date
 from typing import TYPE_CHECKING, Any, Callable, Awaitable
 
@@ -17,6 +16,7 @@ from app.services.notifications.providers.telegram import (
     TelegramNotificationProvider,
     get_telegram_provider,
 )
+from app.services.telegram_connection import get_telegram_connection_service
 
 if TYPE_CHECKING:
     from app.services.notifications.telegram.handler import TelegramUpdate, TelegramHandler
@@ -328,6 +328,7 @@ Inbox: {inbox_count} item{"s" if inbox_count != 1 else ""} waiting"""
 
         The token is stored temporarily and validated when
         the user completes the connection flow in the app.
+        Tokens expire after 15 minutes.
 
         Args:
             chat_id: Telegram chat ID to associate.
@@ -336,16 +337,8 @@ Inbox: {inbox_count} item{"s" if inbox_count != 1 else ""} waiting"""
             Connection token or None on failure.
         """
         try:
-            # Generate secure token
-            token = secrets.token_urlsafe(32)
-
-            # Store in a connection_tokens table or cache
-            # For now, we'll use a simple approach with the profiles table
-            # In production, you'd want a separate table with expiration
-
-            # Actually, let's create a pending_telegram_connections entry
-            # This would need a migration, so for MVP we'll return None
-            # and prompt users to connect via the app settings
+            service = get_telegram_connection_service()
+            token = await service.create_token(chat_id)
 
             logger.info(
                 "Connection token generated",
@@ -353,8 +346,6 @@ Inbox: {inbox_count} item{"s" if inbox_count != 1 else ""} waiting"""
                 token_prefix=token[:8],
             )
 
-            # TODO: Store token with expiration for connection flow
-            # For now, return the token (it won't be validated without storage)
             return token
 
         except Exception as e:

@@ -790,12 +790,12 @@
 |---------|------|--------|
 | TG-0011 | Database Migration | DONE |
 | TG-0012 | Token Storage Service | DONE |
-| TG-0013 | Update /start Command | NOT STARTED |
+| TG-0013 | Update /start Command | DONE |
 | TG-0014 | Connection API Endpoint | NOT STARTED |
 | TG-0015 | Connection Page (Frontend) | NOT STARTED |
 | TG-0016 | Disconnect Functionality | NOT STARTED |
 
-**Next:** Start with TG-0013 (Update /start Command)
+**Next:** Start with TG-0014 (Connection API Endpoint)
 
 ### Phase 8 Artifacts
 
@@ -922,10 +922,25 @@
 - Singleton factory function `get_telegram_connection_service()`
 - Artifacts: `backend/app/services/telegram_connection.py`
 
+#### TG-0013: Update /start Command
+- Updated `_generate_connection_token()` to use `TelegramConnectionService`
+- Removed unused `secrets` import, added service import
+- Tokens now persist to `pending_telegram_connections` table with 15-min expiry
+- Existing users still get "Welcome back" message without new token
+- New users get connection link: `{app_url}/settings/telegram?token={token}`
+- Artifacts: Updated `backend/app/services/notifications/telegram/commands.py`
+
 ---
 
 *Last session ended: December 17, 2025*
-*Next session should: Implement TG-0013 (Update /start Command) - third substep of TG-001*
+*Next session should: Implement TG-0014 (Connection API Endpoint) - fourth substep of TG-001*
+
+**Session Notes (December 17, 2025 - TG-0013):**
+- Implemented TG-0013 (Update /start Command)
+- Updated `_generate_connection_token()` to use `TelegramConnectionService`
+- Tokens now persist to DB with 15-min expiry
+- Verified via test: token creation, validation, and consumption all work correctly
+- Progress: 3/6 substeps complete for TG-001
 
 **Session Notes (December 17, 2025 - Implementation):**
 - Implemented TG-0011 (Database Migration) and TG-0012 (Token Storage Service)
