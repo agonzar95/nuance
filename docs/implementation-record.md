@@ -791,11 +791,11 @@
 | TG-0011 | Database Migration | DONE |
 | TG-0012 | Token Storage Service | DONE |
 | TG-0013 | Update /start Command | DONE |
-| TG-0014 | Connection API Endpoint | NOT STARTED |
+| TG-0014 | Connection API Endpoint | DONE |
 | TG-0015 | Connection Page (Frontend) | NOT STARTED |
 | TG-0016 | Disconnect Functionality | NOT STARTED |
 
-**Next:** Start with TG-0014 (Connection API Endpoint)
+**Next:** Start with TG-0015 (Connection Page Frontend)
 
 ### Phase 8 Artifacts
 
@@ -930,10 +930,30 @@
 - New users get connection link: `{app_url}/settings/telegram?token={token}`
 - Artifacts: Updated `backend/app/services/notifications/telegram/commands.py`
 
+#### TG-0014: Connection API Endpoint
+- Added three authenticated endpoints to `backend/app/routers/telegram.py`:
+  - `POST /telegram/connect` - Validates token, links Telegram chat_id to user profile
+  - `POST /telegram/disconnect` - Clears telegram_chat_id from user profile
+  - `GET /telegram/status` - Returns connection status (bonus endpoint)
+- Request/response models: `ConnectRequest`, `ConnectResponse`, `ConnectionStatus`
+- Uses `TelegramConnectionService.consume_token()` for one-time token validation
+- Updates `profiles.telegram_chat_id` on successful connection
+- Returns 400 for invalid/expired tokens, 401 for missing auth
+- Artifacts: Updated `backend/app/routers/telegram.py`
+
 ---
 
 *Last session ended: December 17, 2025*
-*Next session should: Implement TG-0014 (Connection API Endpoint) - fourth substep of TG-001*
+*Next session should: Implement TG-0015 (Connection Page Frontend) - fifth substep of TG-001*
+
+**Session Notes (December 17, 2025 - TG-0014):**
+- Implemented TG-0014 (Connection API Endpoint)
+- Added POST /telegram/connect - consumes token, links Telegram to user profile
+- Added POST /telegram/disconnect - clears Telegram link from profile
+- Added GET /telegram/status - bonus endpoint for frontend convenience
+- All endpoints use JWT authentication via CurrentUser dependency
+- Type errors fixed, app loads successfully
+- Progress: 4/6 substeps complete for TG-001
 
 **Session Notes (December 17, 2025 - TG-0013):**
 - Implemented TG-0013 (Update /start Command)
