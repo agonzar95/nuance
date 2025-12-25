@@ -15,7 +15,7 @@ from app.logging_config import (
     get_logger,
 )
 from app.middleware import setup_exception_handlers
-from app.routers import ai_router, transcription_router, telegram_router
+from app.routers import ai_router, transcription_router, telegram_router, knowledge_router
 
 
 @asynccontextmanager
@@ -91,3 +91,4 @@ async def health() -> dict[str, str]:
 app.include_router(ai_router)
 app.include_router(transcription_router)
 app.include_router(telegram_router)
+app.include_router(knowledge_router)

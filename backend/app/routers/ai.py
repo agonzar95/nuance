@@ -42,6 +42,10 @@ from app.contracts import (
     get_contract_mapper,
     map_router_response_to_contract,
 )
+from app.services.knowledge_writeback import (
+    KnowledgeWritebackService,
+    get_knowledge_writeback_service,
+)
 
 logger = structlog.get_logger()
 
@@ -420,6 +424,17 @@ async def process(
             raw_input=request.text,
             processing_time_ms=processing_time_ms,
         )
+
+        # Persist derived knowledge objects (async, non-blocking on failure)
+        try:
+            writeback_service = get_knowledge_writeback_service()
+            await writeback_service.process_agent_output(
+                user_id=user.id,
+                contract=contract,
+            )
+        except Exception as e:
+            logger.error("Knowledge writeback failed", error=str(e), user_id=user.id)
+
         return contract
 
     return response
@@ -487,6 +502,19 @@ async def process_v2(
         ai_response=response.coaching_response or (response.command_response.message if response.command_response else None),
         processing_time_ms=processing_time_ms,
     )
+
+    # Persist derived knowledge objects (async, non-blocking on failure)
+    try:
+        writeback_service = get_knowledge_writeback_service()
+        await writeback_service.process_agent_output(
+            user_id=user.id,
+            contract=contract,
+            source_conversation_id=None,  # Could be passed if available
+            source_message_id=None,  # Could be passed if available
+        )
+    except Exception as e:
+        # Don't let writeback failures break the main flow
+        logger.error("Knowledge writeback failed", error=str(e), user_id=user.id)
 
     return contract
 
