@@ -961,8 +961,20 @@
 
 ---
 
-*Last session ended: December 17, 2025*
-*Next session should: Set up Telegram webhook (requires tunnel for local dev or deploy to production), then test full Telegram messaging flow*
+*Last session ended: December 25, 2025*
+*Next session should: Run the migration `006_knowledge_objects.sql` in Supabase, then test knowledge object writeback and query APIs*
+
+**Session Notes (December 25, 2025 - MEM-001 Knowledge Objects):**
+- Implemented MEM-001 (Knowledge Objects) - derived knowledge persistence layer
+- Created `006_knowledge_objects.sql` migration with table, indexes, RLS policies
+- Created `KnowledgeObjectService` with CRUD, query, and upsert methods
+- Created `KnowledgeWritebackService` for automatic knowledge extraction from AgentOutputContract
+- Created `/api/knowledge` router with query endpoints (by type, action, conversation, search)
+- Integrated writeback into `/api/ai/process/v2` endpoint
+- Added comprehensive tests in `tests/test_knowledge_objects.py`
+- Created documentation at `docs/memory/knowledge_objects_v0.md`
+- Commit: `7d119fb` [MEM-001] Implement Knowledge Objects persistence layer
+- This feature extends beyond original 107 features (new memory/bookkeeping layer)
 
 **Session Notes (December 17, 2025 - E2E Testing):**
 - Ran manual E2E test for TG-001 Telegram Integration
