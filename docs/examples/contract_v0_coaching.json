@@ -1,0 +1,172 @@
+{
+  "$schema": "../../shared/contracts/agent_output/v0/schema.json",
+  "_description": "COACHING example: User is stuck on one action, receives coaching, breakdown, and bookkeeping updates",
+  "contract_version": "0.1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440002",
+  "trace_id": "trace-def456",
+  "timestamp": "2025-01-15T15:45:00.000Z",
+  "intent": {
+    "type": "coaching",
+    "confidence": 0.92,
+    "reasoning": "User expressing emotional difficulty and asking for help with a specific task"
+  },
+  "output": {
+    "raw_input": "I keep staring at this tax folder and I just can't make myself start. I've been avoiding it for 3 weeks now and it's making me feel terrible.",
+    "captures": [
+      {
+        "id": "cap_tax01234",
+        "type": "task",
+        "title": "Complete tax preparation",
+        "raw_segment": "this tax folder",
+        "estimated_minutes": 120,
+        "avoidance_weight": 5,
+        "confidence": 0.85,
+        "ambiguities": ["Are these personal or business taxes?", "What's the deadline?"],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "protection",
+          "cognitive_load": "high_friction",
+          "time_horizon": "this_month",
+          "agency_level": "autonomous",
+          "psych_source": "avoidance",
+          "system_role": "coach"
+        },
+        "magnitude": {
+          "scope": "project",
+          "complexity": 4,
+          "dependencies": 0,
+          "uncertainty": 0.3
+        },
+        "state": {
+          "stage": "blocked",
+          "bottleneck": "Executive function paralysis - 3 weeks of avoidance indicates significant emotional weight",
+          "energy_required": "high"
+        },
+        "needs_breakdown": true
+      }
+    ],
+    "atomic_tasks": [
+      {
+        "id": "task_tax_step1",
+        "parent_capture_id": "cap_tax01234",
+        "verb": "Touch",
+        "object": "tax folder",
+        "full_description": "Just physically touch the tax folder - don't open it yet",
+        "definition_of_done": "Your hand has touched the folder",
+        "estimated_minutes": 1,
+        "energy_level": "low",
+        "prerequisites": [],
+        "is_first_action": true,
+        "is_physical": true
+      },
+      {
+        "id": "task_tax_step2",
+        "parent_capture_id": "cap_tax01234",
+        "verb": "Open",
+        "object": "tax folder",
+        "full_description": "Open the folder and look at what's inside",
+        "definition_of_done": "Folder is open and you can see the contents",
+        "estimated_minutes": 1,
+        "energy_level": "low",
+        "prerequisites": ["task_tax_step1"],
+        "is_first_action": false,
+        "is_physical": true
+      },
+      {
+        "id": "task_tax_step3",
+        "parent_capture_id": "cap_tax01234",
+        "verb": "Count",
+        "object": "documents",
+        "full_description": "Count how many documents are in the folder",
+        "definition_of_done": "You know how many papers are there",
+        "estimated_minutes": 2,
+        "energy_level": "low",
+        "prerequisites": ["task_tax_step2"],
+        "is_first_action": false,
+        "is_physical": true
+      },
+      {
+        "id": "task_tax_step4",
+        "parent_capture_id": "cap_tax01234",
+        "verb": "Find",
+        "object": "W-2 form",
+        "full_description": "Locate your W-2 form in the pile",
+        "definition_of_done": "W-2 is separated from the other documents",
+        "estimated_minutes": 3,
+        "energy_level": "low",
+        "prerequisites": ["task_tax_step3"],
+        "is_first_action": false,
+        "is_physical": true
+      },
+      {
+        "id": "task_tax_step5",
+        "parent_capture_id": "cap_tax01234",
+        "verb": "Open",
+        "object": "TurboTax website",
+        "full_description": "Open TurboTax or your tax software in a browser",
+        "definition_of_done": "Tax software login page is visible",
+        "estimated_minutes": 2,
+        "energy_level": "low",
+        "prerequisites": ["task_tax_step4"],
+        "is_first_action": false,
+        "is_physical": true
+      }
+    ],
+    "state_updates": [
+      {
+        "entity_type": "action",
+        "entity_id": "existing-action-uuid-if-known",
+        "temp_id": "cap_tax01234",
+        "operation": "updated",
+        "changes": {
+          "avoidance_weight": 5,
+          "status": "inbox"
+        }
+      }
+    ],
+    "questions": [],
+    "insights": [],
+    "coaching_message": "I hear you - taxes are one of those tasks that feel so much heavier than they actually are. Three weeks of carrying this around sounds exhausting. The good news? The hardest part is almost always just starting.\n\nHere's what I've noticed: our brains protect us from overwhelming things by making them feel impossible. But once we take even the tiniest action, that wall starts to crumble.\n\nWhat if we made this ridiculously small? I'm talking just touching the folder. Not opening it, not doing anything with it - just putting your hand on it for 10 seconds. That's the whole task.\n\nIf that feels okay, you could peek inside. Count the papers. That's it.\n\nWould you be willing to try just touching the folder right now?",
+    "command_result": null,
+    "user_facing_summary": "I understand this has been weighing on you. Let's start impossibly small - just touch the folder. I've broken down the first few micro-steps to make this feel manageable.",
+    "ui_blocks": [
+      {
+        "type": "coaching_message",
+        "data": {
+          "tone": "warm_supportive",
+          "acknowledges_difficulty": true,
+          "provides_tiny_step": true
+        },
+        "priority": 0
+      },
+      {
+        "type": "breakdown_steps",
+        "data": {
+          "parent_id": "cap_tax01234",
+          "steps": ["task_tax_step1", "task_tax_step2", "task_tax_step3", "task_tax_step4", "task_tax_step5"],
+          "first_step_emphasis": "Just touch the folder - 10 seconds",
+          "total_time_if_all": 9
+        },
+        "priority": 1
+      }
+    ],
+    "overall_confidence": 0.85,
+    "cognitive_load": "high_friction",
+    "needs_scaffolding": false,
+    "scaffolding_question": null
+  },
+  "provenance": {
+    "model_id": "claude-3-5-sonnet-20241022",
+    "prompt_versions": {
+      "intent": "1.1.0",
+      "coaching": "1.0.0",
+      "breakdown": "1.0.0",
+      "cognitive_appraisal": "1.0.0"
+    },
+    "processing_time_ms": 1850,
+    "token_usage": {
+      "input_tokens": 980,
+      "output_tokens": 650
+    }
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "$schema": "../../shared/contracts/agent_output/v0/schema.json",
+  "_description": "CLARIFY example: Low confidence extraction triggers clarification questions with partial capture and bookkeeping updates",
+  "contract_version": "0.1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440003",
+  "trace_id": "trace-ghi789",
+  "timestamp": "2025-01-15T16:20:00.000Z",
+  "intent": {
+    "type": "clarify",
+    "confidence": 0.78,
+    "reasoning": "Input is ambiguous - could be multiple tasks or one complex task, needs clarification"
+  },
+  "output": {
+    "raw_input": "I should probably deal with that project thing for Sarah and also maybe reach out to the team about the thing next month",
+    "captures": [
+      {
+        "id": "cap_partial_1",
+        "type": "task",
+        "title": "Handle project for Sarah",
+        "raw_segment": "deal with that project thing for Sarah",
+        "estimated_minutes": 60,
+        "avoidance_weight": 3,
+        "confidence": 0.45,
+        "ambiguities": [
+          "What project is this?",
+          "What does 'deal with' mean - complete it, review it, discuss it?",
+          "By when does Sarah need this?"
+        ],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "unknown",
+          "cognitive_load": "unknown",
+          "time_horizon": "unknown",
+          "agency_level": "unknown",
+          "psych_source": "unknown",
+          "system_role": "capture"
+        },
+        "magnitude": {
+          "scope": "composite",
+          "complexity": 3,
+          "dependencies": 0,
+          "uncertainty": 0.7
+        },
+        "state": {
+          "stage": "unknown",
+          "bottleneck": "Scope unclear",
+          "energy_required": "unknown"
+        },
+        "needs_breakdown": false
+      },
+      {
+        "id": "cap_partial_2",
+        "type": "task",
+        "title": "Contact team about upcoming event",
+        "raw_segment": "reach out to the team about the thing next month",
+        "estimated_minutes": 30,
+        "avoidance_weight": 2,
+        "confidence": 0.40,
+        "ambiguities": [
+          "Which team?",
+          "What is 'the thing next month'?",
+          "Is this a meeting, event, deadline, or something else?"
+        ],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "connection",
+          "cognitive_load": "unknown",
+          "time_horizon": "this_month",
+          "agency_level": "autonomous",
+          "psych_source": "unknown",
+          "system_role": "capture"
+        },
+        "magnitude": {
+          "scope": "atomic",
+          "complexity": 2,
+          "dependencies": 0,
+          "uncertainty": 0.6
+        },
+        "state": {
+          "stage": "not_started",
+          "bottleneck": "Details unclear",
+          "energy_required": "unknown"
+        },
+        "needs_breakdown": false
+      }
+    ],
+    "atomic_tasks": [],
+    "state_updates": [
+      {
+        "entity_type": "action",
+        "entity_id": null,
+        "temp_id": "cap_partial_1",
+        "operation": "created",
+        "changes": {
+          "title": "Handle project for Sarah",
+          "status": "inbox",
+          "complexity": "composite",
+          "avoidance_weight": 3,
+          "estimated_minutes": 60,
+          "_pending_clarification": true
+        }
+      },
+      {
+        "entity_type": "action",
+        "entity_id": null,
+        "temp_id": "cap_partial_2",
+        "operation": "created",
+        "changes": {
+          "title": "Contact team about upcoming event",
+          "status": "inbox",
+          "complexity": "atomic",
+          "avoidance_weight": 2,
+          "estimated_minutes": 30,
+          "_pending_clarification": true
+        }
+      }
+    ],
+    "questions": [
+      {
+        "id": "q_sarah_project",
+        "question": "What project is this for Sarah? Can you give me a bit more detail so I capture it correctly?",
+        "target_capture_id": "cap_partial_1",
+        "question_type": "scope",
+        "suggested_answers": [
+          "It's the Q1 report",
+          "It's the website redesign",
+          "It's a presentation she asked for"
+        ]
+      },
+      {
+        "id": "q_sarah_action",
+        "question": "When you say 'deal with', what specifically do you need to do?",
+        "target_capture_id": "cap_partial_1",
+        "question_type": "scope",
+        "suggested_answers": [
+          "Review and give feedback",
+          "Complete my part of it",
+          "Send it to her"
+        ]
+      },
+      {
+        "id": "q_team_what",
+        "question": "What's 'the thing next month'? Is this a meeting, deadline, or event?",
+        "target_capture_id": "cap_partial_2",
+        "question_type": "scope",
+        "suggested_answers": [
+          "Team offsite",
+          "Quarterly review",
+          "Product launch"
+        ]
+      },
+      {
+        "id": "q_team_which",
+        "question": "Which team should you reach out to?",
+        "target_capture_id": "cap_partial_2",
+        "question_type": "scope",
+        "suggested_answers": [
+          "My direct team",
+          "The engineering team",
+          "Cross-functional stakeholders"
+        ]
+      }
+    ],
+    "insights": [],
+    "coaching_message": null,
+    "command_result": null,
+    "user_facing_summary": "I captured two items, but I want to make sure I got them right. The details are a bit fuzzy - can you help me clarify a few things so I don't miss anything important?",
+    "ui_blocks": [
+      {
+        "type": "capture_list",
+        "data": {
+          "captures": ["cap_partial_1", "cap_partial_2"],
+          "status": "pending_clarification",
+          "show_confidence_warning": true
+        },
+        "priority": 0
+      },
+      {
+        "type": "question_prompt",
+        "data": {
+          "questions": ["q_sarah_project", "q_sarah_action"],
+          "target_capture_id": "cap_partial_1",
+          "style": "inline_card"
+        },
+        "priority": 1
+      },
+      {
+        "type": "question_prompt",
+        "data": {
+          "questions": ["q_team_what", "q_team_which"],
+          "target_capture_id": "cap_partial_2",
+          "style": "inline_card"
+        },
+        "priority": 2
+      }
+    ],
+    "overall_confidence": 0.42,
+    "cognitive_load": "routine",
+    "needs_scaffolding": false,
+    "scaffolding_question": null
+  },
+  "provenance": {
+    "model_id": "claude-3-5-sonnet-20241022",
+    "prompt_versions": {
+      "intent": "1.1.0",
+      "extraction": "1.1.0",
+      "confidence": "1.0.0",
+      "cognitive_appraisal": "1.0.0"
+    },
+    "processing_time_ms": 1420,
+    "token_usage": {
+      "input_tokens": 850,
+      "output_tokens": 520
+    }
+  }
+}

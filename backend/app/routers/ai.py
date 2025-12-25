@@ -5,10 +5,11 @@ All endpoints require authentication via Supabase JWT.
 """
 
 import json
+import time
 from collections.abc import AsyncIterator
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
@@ -36,6 +37,11 @@ from app.services.token_budget import (
     get_token_budget_service,
 )
 from app.services.intent_logger import log_intent
+from app.contracts import (
+    AgentOutputContract,
+    get_contract_mapper,
+    map_router_response_to_contract,
+)
 
 logger = structlog.get_logger()
 
@@ -340,13 +346,17 @@ async def status(
 # ============================================================================
 
 
-@router.post("/process", response_model=RouterResponse)
+@router.post("/process")
 async def process(
     request: ProcessRequest,
     user: CurrentUser,
     rate_limit: RateLimit,
     intent_router: IntentRouter = Depends(get_intent_router),
-) -> RouterResponse:
+    use_contract: bool = Query(
+        default=False,
+        description="Return AgentOutputContract v0 format instead of RouterResponse",
+    ),
+) -> RouterResponse | AgentOutputContract:
     """Process a message through the intent router.
 
     This is the main entry point for user messages. It:
@@ -361,31 +371,124 @@ async def process(
 
     You can force a specific intent using the force_intent field to skip
     classification. This is useful for UI flows where the intent is known.
+
+    Set use_contract=true to receive the new AgentOutputContract v0 format.
     """
+    start_time = time.time()
+
     logger.info(
         "Processing message",
         user_id=user.id,
         text_length=len(request.text),
         force_intent=request.force_intent,
+        use_contract=use_contract,
     )
 
     if request.force_intent:
         # Skip classification, use forced intent
-        return await intent_router.route_with_intent(
+        response = await intent_router.route_with_intent(
             text=request.text,
             intent=request.force_intent,
             user_id=user.id,
             task_id=request.task_id,
             task_title=request.task_title,
         )
+    else:
+        # Normal flow: classify and route
+        response = await intent_router.route(
+            text=request.text,
+            user_id=user.id,
+            task_id=request.task_id,
+            task_title=request.task_title,
+        )
 
-    # Normal flow: classify and route
-    return await intent_router.route(
-        text=request.text,
+    # Log intent for analytics
+    processing_time_ms = int((time.time() - start_time) * 1000)
+    await log_intent(
         user_id=user.id,
-        task_id=request.task_id,
-        task_title=request.task_title,
+        raw_input=request.text,
+        classified_intent=response.intent.value,
+        extraction_result=response.extraction.model_dump() if response.extraction else None,
+        ai_response=response.coaching_response or (response.command_response.message if response.command_response else None),
+        processing_time_ms=processing_time_ms,
     )
+
+    # Return contract format if requested
+    if use_contract:
+        contract = map_router_response_to_contract(
+            response=response,
+            raw_input=request.text,
+            processing_time_ms=processing_time_ms,
+        )
+        return contract
+
+    return response
+
+
+@router.post("/process/v2", response_model=AgentOutputContract)
+async def process_v2(
+    request: ProcessRequest,
+    user: CurrentUser,
+    rate_limit: RateLimit,
+    intent_router: IntentRouter = Depends(get_intent_router),
+) -> AgentOutputContract:
+    """Process a message and return AgentOutputContract v0.
+
+    This endpoint always returns the new contract format. Use this for
+    new integrations or when migrating to the v0 contract.
+
+    The contract provides:
+    - Standardized response structure across all intent types
+    - Rich metadata (taxonomy, magnitude, state inference)
+    - UI rendering hints
+    - Provenance tracking (model, prompt versions, timing)
+
+    See /docs/contracts/agent_output_v0.md for full documentation.
+    """
+    start_time = time.time()
+
+    logger.info(
+        "Processing message (v2 contract)",
+        user_id=user.id,
+        text_length=len(request.text),
+        force_intent=request.force_intent,
+    )
+
+    if request.force_intent:
+        response = await intent_router.route_with_intent(
+            text=request.text,
+            intent=request.force_intent,
+            user_id=user.id,
+            task_id=request.task_id,
+            task_title=request.task_title,
+        )
+    else:
+        response = await intent_router.route(
+            text=request.text,
+            user_id=user.id,
+            task_id=request.task_id,
+            task_title=request.task_title,
+        )
+
+    processing_time_ms = int((time.time() - start_time) * 1000)
+
+    # Log intent with contract format
+    contract = map_router_response_to_contract(
+        response=response,
+        raw_input=request.text,
+        processing_time_ms=processing_time_ms,
+    )
+
+    await log_intent(
+        user_id=user.id,
+        raw_input=request.text,
+        classified_intent=response.intent.value,
+        extraction_result=contract.model_dump(),  # Store full contract
+        ai_response=response.coaching_response or (response.command_response.message if response.command_response else None),
+        processing_time_ms=processing_time_ms,
+    )
+
+    return contract
 
 
 @router.post("/process/stream")

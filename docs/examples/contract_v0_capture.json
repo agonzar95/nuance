@@ -1,0 +1,267 @@
+{
+  "$schema": "../../shared/contracts/agent_output/v0/schema.json",
+  "_description": "CAPTURE example: User dumps multiple thoughts with extraction, taxonomy, atomic tasks, and bookkeeping",
+  "contract_version": "0.1.0",
+  "request_id": "550e8400-e29b-41d4-a716-446655440001",
+  "trace_id": "trace-abc123",
+  "timestamp": "2025-01-15T14:30:00.000Z",
+  "intent": {
+    "type": "capture",
+    "confidence": 0.95,
+    "reasoning": "User is listing tasks and planning work"
+  },
+  "output": {
+    "raw_input": "I need to finally call the insurance company about that claim, ugh. Also buy groceries - we're out of milk and eggs. And I've been putting off starting that presentation for the board meeting next week.",
+    "captures": [
+      {
+        "id": "cap_a1b2c3d4",
+        "type": "task",
+        "title": "Call insurance company about claim",
+        "raw_segment": "I need to finally call the insurance company about that claim, ugh",
+        "estimated_minutes": 30,
+        "avoidance_weight": 4,
+        "confidence": 0.88,
+        "ambiguities": ["Which claim specifically?", "Do you have the claim number ready?"],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "protection",
+          "cognitive_load": "high_friction",
+          "time_horizon": "today",
+          "agency_level": "autonomous",
+          "psych_source": "avoidance",
+          "system_role": "scaffold"
+        },
+        "magnitude": {
+          "scope": "atomic",
+          "complexity": 2,
+          "dependencies": 0,
+          "uncertainty": 0.2
+        },
+        "state": {
+          "stage": "not_started",
+          "bottleneck": "Emotional resistance - 'finally' and 'ugh' indicate prolonged avoidance",
+          "energy_required": "high"
+        },
+        "needs_breakdown": true
+      },
+      {
+        "id": "cap_e5f6g7h8",
+        "type": "task",
+        "title": "Buy groceries (milk and eggs)",
+        "raw_segment": "Also buy groceries - we're out of milk and eggs",
+        "estimated_minutes": 30,
+        "avoidance_weight": 1,
+        "confidence": 0.95,
+        "ambiguities": [],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "maintenance",
+          "cognitive_load": "routine",
+          "time_horizon": "today",
+          "agency_level": "autonomous",
+          "psych_source": "intrinsic",
+          "system_role": "track"
+        },
+        "magnitude": {
+          "scope": "atomic",
+          "complexity": 1,
+          "dependencies": 0,
+          "uncertainty": 0.0
+        },
+        "state": {
+          "stage": "not_started",
+          "bottleneck": null,
+          "energy_required": "low"
+        },
+        "needs_breakdown": false
+      },
+      {
+        "id": "cap_i9j0k1l2",
+        "type": "task",
+        "title": "Create board meeting presentation",
+        "raw_segment": "I've been putting off starting that presentation for the board meeting next week",
+        "estimated_minutes": 180,
+        "avoidance_weight": 5,
+        "confidence": 0.82,
+        "ambiguities": ["What is the presentation topic?", "What format/template should be used?", "Who is the audience beyond 'the board'?"],
+        "labels": {
+          "intent_layer": "execute",
+          "survival_function": "growth",
+          "cognitive_load": "high_friction",
+          "time_horizon": "this_week",
+          "agency_level": "autonomous",
+          "psych_source": "avoidance",
+          "system_role": "scaffold"
+        },
+        "magnitude": {
+          "scope": "project",
+          "complexity": 4,
+          "dependencies": 0,
+          "uncertainty": 0.4
+        },
+        "state": {
+          "stage": "not_started",
+          "bottleneck": "Vague scope and high stakes causing paralysis",
+          "energy_required": "high"
+        },
+        "needs_breakdown": true
+      }
+    ],
+    "atomic_tasks": [
+      {
+        "id": "task_m3n4o5p6",
+        "parent_capture_id": "cap_a1b2c3d4",
+        "verb": "Find",
+        "object": "insurance claim paperwork",
+        "full_description": "Find the insurance claim paperwork in your files",
+        "definition_of_done": "Claim number is visible in front of you",
+        "estimated_minutes": 5,
+        "energy_level": "low",
+        "prerequisites": [],
+        "is_first_action": true,
+        "is_physical": true
+      },
+      {
+        "id": "task_q7r8s9t0",
+        "parent_capture_id": "cap_a1b2c3d4",
+        "verb": "Open",
+        "object": "phone dialer",
+        "full_description": "Open your phone and dial the insurance company number",
+        "definition_of_done": "Phone is ringing",
+        "estimated_minutes": 2,
+        "energy_level": "medium",
+        "prerequisites": ["task_m3n4o5p6"],
+        "is_first_action": false,
+        "is_physical": true
+      },
+      {
+        "id": "task_u1v2w3x4",
+        "parent_capture_id": "cap_i9j0k1l2",
+        "verb": "Open",
+        "object": "presentation software",
+        "full_description": "Open PowerPoint or Google Slides",
+        "definition_of_done": "Blank presentation is on screen",
+        "estimated_minutes": 1,
+        "energy_level": "low",
+        "prerequisites": [],
+        "is_first_action": true,
+        "is_physical": true
+      },
+      {
+        "id": "task_y5z6a7b8",
+        "parent_capture_id": "cap_i9j0k1l2",
+        "verb": "Write",
+        "object": "presentation title",
+        "full_description": "Type a working title on the first slide",
+        "definition_of_done": "First slide has a title",
+        "estimated_minutes": 2,
+        "energy_level": "low",
+        "prerequisites": ["task_u1v2w3x4"],
+        "is_first_action": false,
+        "is_physical": true
+      }
+    ],
+    "state_updates": [
+      {
+        "entity_type": "action",
+        "entity_id": null,
+        "temp_id": "cap_a1b2c3d4",
+        "operation": "created",
+        "changes": {
+          "title": "Call insurance company about claim",
+          "status": "inbox",
+          "complexity": "atomic",
+          "avoidance_weight": 4,
+          "estimated_minutes": 30
+        }
+      },
+      {
+        "entity_type": "action",
+        "entity_id": null,
+        "temp_id": "cap_e5f6g7h8",
+        "operation": "created",
+        "changes": {
+          "title": "Buy groceries (milk and eggs)",
+          "status": "inbox",
+          "complexity": "atomic",
+          "avoidance_weight": 1,
+          "estimated_minutes": 30
+        }
+      },
+      {
+        "entity_type": "action",
+        "entity_id": null,
+        "temp_id": "cap_i9j0k1l2",
+        "operation": "created",
+        "changes": {
+          "title": "Create board meeting presentation",
+          "status": "inbox",
+          "complexity": "project",
+          "avoidance_weight": 5,
+          "estimated_minutes": 180
+        }
+      }
+    ],
+    "questions": [],
+    "insights": [
+      {
+        "pattern_name": "Board Meeting Anxiety",
+        "description": "You've mentioned 'the board' in high-avoidance tasks before. This seems to be a recurring source of stress.",
+        "suggested_strategy": "Consider breaking board-related tasks into smaller pieces and starting with the least stressful part first.",
+        "confidence": 0.75
+      }
+    ],
+    "coaching_message": null,
+    "command_result": null,
+    "user_facing_summary": "Got it! I captured 3 tasks for you. The insurance call and board presentation both seem to be weighing on you - I've broken them down into tiny first steps to make starting easier. The groceries are straightforward. Would you like to tackle one of the first steps now?",
+    "ui_blocks": [
+      {
+        "type": "capture_list",
+        "data": {
+          "captures": ["cap_a1b2c3d4", "cap_e5f6g7h8", "cap_i9j0k1l2"],
+          "highlight_high_friction": ["cap_a1b2c3d4", "cap_i9j0k1l2"]
+        },
+        "priority": 0
+      },
+      {
+        "type": "breakdown_steps",
+        "data": {
+          "parent_id": "cap_a1b2c3d4",
+          "steps": ["task_m3n4o5p6", "task_q7r8s9t0"],
+          "first_step_emphasis": "Start by finding your claim paperwork - just 5 minutes"
+        },
+        "priority": 1
+      },
+      {
+        "type": "insight_card",
+        "data": {
+          "pattern": "Board Meeting Anxiety",
+          "actionable": true
+        },
+        "priority": 2
+      }
+    ],
+    "overall_confidence": 0.88,
+    "cognitive_load": "high_friction",
+    "needs_scaffolding": true,
+    "scaffolding_question": "What part of the board presentation feels the 'heaviest' right now?"
+  },
+  "provenance": {
+    "model_id": "claude-3-5-sonnet-20241022",
+    "prompt_versions": {
+      "intent": "1.1.0",
+      "extraction": "1.1.0",
+      "avoidance": "1.0.0",
+      "complexity": "1.1.0",
+      "confidence": "1.0.0",
+      "cognitive_appraisal": "1.0.0",
+      "project_scaffolding": "1.0.0",
+      "insight_analysis": "1.0.0"
+    },
+    "processing_time_ms": 2340,
+    "token_usage": {
+      "input_tokens": 1250,
+      "output_tokens": 890
+    }
+  }
+}
