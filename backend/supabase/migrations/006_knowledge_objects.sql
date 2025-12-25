@@ -92,10 +92,11 @@ CREATE INDEX idx_knowledge_objects_request_id
 CREATE INDEX idx_knowledge_objects_payload
   ON knowledge_objects USING GIN (payload);
 
--- Query active objects (not expired)
+-- Query active objects (not expired) - only indexes NULL valid_to
+-- Time comparison (valid_to > NOW()) must be done at query time
 CREATE INDEX idx_knowledge_objects_active
   ON knowledge_objects(user_id, type, created_at DESC)
-  WHERE valid_to IS NULL OR valid_to > NOW();
+  WHERE valid_to IS NULL;
 
 -- =============================================================================
 -- Updated_at Trigger
