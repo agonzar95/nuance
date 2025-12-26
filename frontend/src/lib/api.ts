@@ -14,10 +14,12 @@ import {
   ActionUpdate,
   ActionListParams,
   ActionListResponse,
+  ActionComplexity,
   ChatRequest,
   ChatResponse,
   ProcessRequest,
   RouterResponse,
+  Intent,
   Profile,
   ProfileUpdate,
   Conversation,
@@ -28,6 +30,37 @@ import {
   TranscriptionResponse,
   BreakdownResult,
 } from '@/types/api'
+
+// ============================================================================
+// Backend Response Types (internal - represent what backend actually returns)
+// ============================================================================
+
+interface BackendEnrichedAction {
+  title: string
+  estimated_minutes: number
+  raw_segment: string
+  avoidance_weight: number
+  complexity: ActionComplexity
+  needs_breakdown: boolean
+  confidence: number
+  ambiguities: string[]
+}
+
+interface BackendOrchestrationResult {
+  actions: BackendEnrichedAction[]
+  raw_input: string
+  overall_confidence: number
+  needs_validation: boolean
+}
+
+interface BackendRouterResponse {
+  intent: Intent
+  intent_confidence: number
+  response_type: string
+  extraction?: BackendOrchestrationResult
+  coaching_response?: string
+  command_response?: { command: string; message: string; data?: unknown }
+}
 
 // ============================================================================
 // Configuration
@@ -211,11 +244,46 @@ class ApiClient {
 
   /**
    * Process a message through the intent router (non-streaming)
+   * Transforms backend response format to frontend expected format
    */
   async process(request: ProcessRequest): Promise<RouterResponse> {
-    return this.request<RouterResponse>('POST', '/api/ai/process', {
+    const raw = await this.request<BackendRouterResponse>('POST', '/api/ai/process', {
       body: request,
     })
+
+    return {
+      intent: raw.intent,
+      capture: raw.extraction ? {
+        actions: raw.extraction.actions.map(a => ({
+          title: a.title,
+          estimated_minutes: a.estimated_minutes,
+          raw_segment: a.raw_segment,
+          avoidance: {
+            weight: a.avoidance_weight,
+            signals: [],
+            reasoning: '',
+          },
+          complexity: {
+            complexity: a.complexity,
+            suggested_steps: [],
+            needs_breakdown: a.needs_breakdown,
+          },
+          confidence: {
+            confidence: a.confidence,
+            ambiguities: a.ambiguities,
+            reasoning: '',
+          },
+        })),
+        needs_validation: raw.extraction.needs_validation,
+        ambiguities: raw.extraction.actions.flatMap(a => a.ambiguities),
+      } : undefined,
+      coaching: raw.coaching_response
+        ? { message: raw.coaching_response }
+        : undefined,
+      command: raw.command_response
+        ? { command: raw.command_response.command, message: raw.command_response.message }
+        : undefined,
+    }
   }
 
   /**
